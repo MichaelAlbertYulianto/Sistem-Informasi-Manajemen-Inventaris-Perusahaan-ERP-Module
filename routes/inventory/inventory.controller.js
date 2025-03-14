@@ -1,9 +1,18 @@
 const { db } = require("../../db/db");
 const Excel = require("exceljs");
 const moment = require("moment");
+const QRCode = require("qrcode");
+const path = require("path");
+const fs = require("fs");
+const imageDir = path.join(__dirname, "..", "..", "public", "image");
+
+if (!fs.existsSync(imageDir)) {
+    fs.mkdirSync(imageDir, { recursive: true });
+    console.log("Created directory:", imageDir); // Debugging
+}
 
 const getOverviewInventory = async (req, res) => {
-    try{
+    try {
         const [inventories] = await db.query("SELECT * FROM inventories");
         const formattedInventories = inventories.map(inv => ({
             id: inv.id,
@@ -131,12 +140,24 @@ const editInventoryPost = async (req, res) => {
 const deleteInventory = async (req, res) => {
     const { id } = req.params;
     try {
+        const [inventoryRows] = await db.query("SELECT * FROM inventories WHERE id = ?", [id]);
+        if (inventoryRows.length === 0) {
+            req.flash("error", "Inventory not found");
+            return res.redirect("/inventory/overview");
+        }
+        const inventory = inventoryRows[0];
+        const qrImageName = `qr_${id}.png`;
+        const qrImagePath = path.join(imageDir, qrImageName);
+        if (fs.existsSync(qrImagePath)) {
+            fs.unlinkSync(qrImagePath);
+            console.log('QR image deleted successfully');
+        }
         await db.query("DELETE FROM inventories WHERE id = ?", [id]);
-        req.flash("success", "Inventory deleted successfully");
+        req.flash("success", "Inventory and QR image deleted successfully");
         res.redirect("/inventory/overview");
     } catch (error) {
         console.error("deleteInventory", error);
-        req.flash("error", "Failed to delete inventory");
+        req.flash("error", "Failed to delete inventory and QR image");
         res.redirect("/inventory/overview");
     }
 }
@@ -251,6 +272,54 @@ const downloadInventoryStatus = async (req, res) => {
     }
 }
 
+const LoadInventoryDetail = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [inventoryRows] = await db.query("SELECT * FROM inventories WHERE id = ?", [id]);
+        if (inventoryRows.length === 0) {
+            req.flash("error", "Inventory not found");
+            return res.redirect("/inventory/overview");
+        }
+        const inventory = inventoryRows[0];
+        const [statusRows] = await db.query("SELECT status FROM inventory_statuses WHERE inventory_id = ?", [id]);
+        if (statusRows.length > 0) {
+            inventory.status = statusRows[0].status;
+        }
+        res.render("pages/inventory/detailInventory", { inventory });
+    } catch (error) {
+        console.error("detailInventoryId", error);
+        req.flash("error", "Failed to load inventory data");
+        res.redirect("/inventory/overview");
+    }
+}
+
+const generateQrCode = async (req, res) => {
+    try {
+        const id = req.params.id;
+        console.log('Generating QR for ID:', id); // Debugging
+        const url = `${req.protocol}://${req.get('host')}/inventory/detail/${id}`;
+        console.log('QR URL:', url); // Debugging
+        const fileName = `qr_${id}.png`;
+        const filePath = path.join(imageDir, fileName);
+        console.log('Saving QR to:', filePath); // Debugging
+
+        // Generate QR code dan simpan ke file
+        await QRCode.toFile(filePath, url, {
+            width: 200,
+            color: {
+                dark: '#000000',
+                light: '#ffffff'
+            }
+        });
+        console.log('QR code generated and saved successfully'); // Debugging
+
+        res.json({ imageUrl: `/image/${fileName}` });
+    } catch (error) {
+        console.error('Error generating QR code:', error);
+        res.status(500).json({ error: 'Failed to generate QR code' });
+    }
+};
+
 module.exports = {
     getOverviewInventory,
     downloadInvData,
@@ -262,4 +331,6 @@ module.exports = {
     LoadEditInventory,
     LoadInventoryStatus,
     downloadInventoryStatus,
+    LoadInventoryDetail,
+    generateQrCode
 };
