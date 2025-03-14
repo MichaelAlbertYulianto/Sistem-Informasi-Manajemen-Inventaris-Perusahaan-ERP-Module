@@ -1,25 +1,34 @@
 {% extends "layout/masterLayout.njk" %}
 {% block content %}
 <div class="container px-4">
-    <form action="/inventory/add" method="post" class="shadow p-3 rounded" id="addInventoryForm">
+    <form action="/inventory/update/{{ inventory.id }}" method="post" class="shadow p-3 rounded" id="editInventoryForm">
         <h2 class="mb-3">Tambah Barang Baru</h2>
         <div class="mb-2">
             <label for="nama" class="form-label">Nama Barang:</label>
-            <input type="text" class="form-control" id="nama" name="nama" required placeholder="Masukkan nama barang">
+            <input type="text" class="form-control" id="nama" name="nama" required value="{{ inventory.nama }}" placeholder= "Masukkan nama barang">
         </div>
         <div class="mb-2">
             <label for="deskripsi" class="form-label">Deskripsi:</label>
-            <input type="text" class="form-control" id="deskripsi" name="deskripsi" rows="2" required placeholder="Masukkan deskripsi barang"></input>
+            <textarea class="form-control" id="deskripsi" name="deskripsi" rows="2" required>{{ inventory.deskripsi }}</textarea>
         </div>
         <div class="mb-2">
             <label for="tanggal_pembelian" class="form-label">Tanggal Pembelian:</label>
-            <input type="date" class="form-control" id="tanggal_pembelian" name="tanggal_pembelian" required value="{{ today }}" placeholder="Pilih tanggal pembelian">
+            <input type="date" class="form-control" id="tanggal_pembelian" name="tanggal_pembelian" required value="{{ inventory.tanggal_pembelian }}" placeholder="Pilih tanggal pembelian">
         </div>
         <div class="mb-2">
             <label for="harga_pembelian" class="form-label">Harga Beli:</label>
-            <input type="text" class="form-control" id="harga_pembelian" name="harga_pembelian" required placeholder="Masukkan harga beli">
+            <input type="text" class="form-control" id="harga_pembelian" name="harga_pembelian" required value="{{ inventory.harga_pembelian }}" placeholder="Masukkan harga beli">
         </div>
-        <button type="submit" class="btn btn-primary">Tambah Barang</button>
+        <div class="mb-2">
+            <label for="status" class="form-label">Status:</label>
+            <select class="form-select" id="status" name="status" required>
+                <option value="Tersedia" {% if status == "Tersedia" %}selected{% endif %}>Tersedia</option>
+                <option value="Maintenance" {% if status == "Maintenance" %}selected{% endif %}>Maintenance</option>
+                <option value="Lost" {% if status == "Lost" %}selected{% endif %}>Lost</option>
+                <option value="Dipinjam" {% if status == "Dipinjam" %}selected{% endif %}>Dipinjam</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Edit Barang</button>
     </form>
 </div>
 
@@ -39,7 +48,7 @@
     });
 
     // Handle form submission with SweetAlert2 confirmation
-    document.getElementById('addInventoryForm').addEventListener('submit', function(e) {
+    document.getElementById('editInventoryForm').addEventListener('submit', function(e) {
         e.preventDefault(); // Prevent immediate form submission
 
         // Remove delimiter from harga_pembelian before confirmation

@@ -83,16 +83,19 @@ const LoadaddInventory = (req, res) => {
 const addInventoryPost = async (req, res) => {
     const { nama, deskripsi, tanggal_pembelian, harga_pembelian } = req.body;
     try {
-        // Parse harga_pembelian to integer before inserting to the database
         const parsedHargaPembelian = parseInt(harga_pembelian.replace(/\./g, ''), 10);
         const [inventory] = await db.query(
             "INSERT INTO inventories (nama, deskripsi, tanggal_pembelian, harga_pembelian) VALUES (?, ?, ?, ?)",
             [nama, deskripsi, tanggal_pembelian, parsedHargaPembelian]
         );
+        // console.log("INSERT INTO inventories (nama, deskripsi, tanggal_pembelian, harga_pembelian) VALUES (?, ?, ?, ?)", [nama, deskripsi, tanggal_pembelian, parsedHargaPembelian]);
         await db.query(
             "INSERT INTO inventory_statuses (inventory_id, status, created_at) VALUES (?, ?, ?)",
             [inventory.insertId, 'Tersedia', new Date().toISOString().split('T')[0]]
         );
+        // console.log("INSERT INTO inventory_statuses (inventory_id, status, created_at) VALUES (?, ?, ?)",
+        //     [inventory.insertId, 'Tersedia', new Date().toISOString().split('T')[0]]
+        // );
         req.flash("success", "Inventory added successfully");
         res.redirect("/inventory/overview");
     } catch (error) {
@@ -106,36 +109,24 @@ const LoadEditInventory = async (req, res) => {
     const { id } = req.params;
     try {
         const [inventoryRows] = await db.query("SELECT * FROM inventories WHERE id = ?", [id]);
+        const [statusRows] = await db.query("SELECT status FROM inventory_statuses WHERE inventory_id = ?", [id]);
         if (inventoryRows.length === 0) {
             req.flash("error", "Inventory not found");
             return res.redirect("/inventory/overview");
         }
         const inventory = inventoryRows[0];
-        res.render("pages/inventory/editForm", { inventory });
+        
+        inventory.tanggal_pembelian = new Date(inventory.tanggal_pembelian).toISOString().split('T')[0];
+        inventory.harga_pembelian = inventory.harga_pembelian !== null ? Number(inventory.harga_pembelian).toLocaleString('id-ID', { minimumFractionDigits: 0 }) : '';
+        
+        // console.log("Inventory data:", inventory);
+        res.render("pages/inventory/editForm", { inventory, status: statusRows[0].status });
     } catch (error) {
         console.error("LoadEditInventory", error);
         req.flash("error", "Failed to load inventory data");
         res.redirect("/inventory/overview");
     }
-}
-
-const editInventoryPost = async (req, res) => {
-    const { id } = req.params;
-    const { nama, deskripsi, tanggal_pembelian, harga_pembelian } = req.body;
-    try {
-        const parsedHargaPembelian = parseInt(harga_pembelian.replace(/\./g, ''), 10);
-        await db.query(
-            "UPDATE inventories SET nama = ?, deskripsi = ?, tanggal_pembelian = ?, harga_pembelian = ? WHERE id = ?",
-            [nama, deskripsi, tanggal_pembelian, parsedHargaPembelian, id]
-        );
-        req.flash("success", "Inventory updated successfully");
-        res.redirect("/inventory/overview");
-    } catch (error) {
-        console.error("editInventoryPost", error);
-        req.flash("error", "Failed to update inventory");
-        res.redirect(`/inventory/edit/${id}`);
-    }
-}
+};
 
 const deleteInventory = async (req, res) => {
     const { id } = req.params;
@@ -320,17 +311,40 @@ const generateQrCode = async (req, res) => {
     }
 };
 
+const updateInventory = async (req, res) => {
+    const { id } = req.params;
+    const { nama, deskripsi, tanggal_pembelian, harga_pembelian, status } = req.body;
+    try {
+        const parsedHargaPembelian = parseInt(harga_pembelian.replace(/\./g, ''), 10);
+        await db.query(
+            "UPDATE inventories SET nama = ?, deskripsi = ?, tanggal_pembelian = ?, harga_pembelian = ? WHERE id = ?",
+            [nama, deskripsi, tanggal_pembelian, parsedHargaPembelian, id]
+        );
+        // console.log("UPDATE inventories SET nama = ?, deskripsi = ?, tanggal_pembelian = ?, harga_pembelian = ? WHERE id = ?", [nama, deskripsi, tanggal_pembelian, parsedHargaPembelian, id]);
+        await db.query(
+            "UPDATE inventory_statuses SET status = ? WHERE inventory_id = ?",
+            [status, id]
+        );
+        // console.log("UPDATE inventory_statuses SET status = ? WHERE inventory_id = ?", [status, id]);
+        req.flash("success", "Inventory updated successfully");
+        res.redirect("/inventory/overview");
+    } catch (error) {
+        console.error("editInventoryPost", error);
+        req.flash("error", "Failed to update inventory");
+        res.redirect(`/inventory/edit/${id}`);
+    }
+};
+
 module.exports = {
     getOverviewInventory,
     downloadInvData,
     LoadaddInventory,
     addInventoryPost,
-    LoadEditInventory,
-    editInventoryPost,
     deleteInventory,
     LoadEditInventory,
     LoadInventoryStatus,
     downloadInventoryStatus,
     LoadInventoryDetail,
-    generateQrCode
+    generateQrCode,
+    updateInventory,
 };

@@ -46,7 +46,9 @@
                                         <td>{{ inv.tanggal_pembelian }}</td>
                                         <td>{{ inv.harga_pembelian }}</td>
                                         <td>
-                                            <a href="/inventory/edit/{{ inv.id }}" class="btn btn-sm btn-warning">Edit</a>
+                                            <form action="/inventory/edit/{{ inv.id }}" method="post" style="display: inline">
+                                                <button type="submit" class="btn btn-sm btn-warning">Edit</button>
+                                            </form>
                                             <form action="/inventory/delete/{{ inv.id }}" method="post" style="display: inline" class="delete-form">
                                                 <button type="submit" class="btn btn-sm btn-danger delete-btn" data-name="{{ inv.nama }}">Delete</button>
                                             </form>
