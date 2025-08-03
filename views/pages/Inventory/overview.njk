@@ -82,7 +82,7 @@
                 <div class="modal-body">
                     <form action="/inventory/bulk-insert" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                        
+
                         <div class="mb-3">
                             <label for="fileUpload" class="form-label">Upload Excel File</label>
                             <div id="dropzone" class="border border-primary p-4 text-center rounded position-relative">
@@ -140,51 +140,61 @@
 
             if (event.dataTransfer.files.length > 0) {
                 fileInput.files = event.dataTransfer.files;
-                fileNameDisplay.textContent = 'Selected File: ' + event.dataTransfer.files[0].name;
+                fileNameDisplay.textContent = 'Selected File: ' + event
+                    .dataTransfer
+                    .files[0]
+                    .name;
             }
         }
 
         function handleFileSelect(event) {
             const fileNameDisplay = document.getElementById('fileName');
-            fileNameDisplay.textContent = 'Selected File: ' + event.target.files[0].name;
+            fileNameDisplay.textContent = 'Selected File: ' + event
+                .target
+                .files[0]
+                .name;
         }
 
-        document.querySelector('form[action="/inventory/bulk-insert"]').addEventListener('submit', function(e) {
-            const fileInput = document.getElementById('fileUpload');
-            if (!fileInput.files.length) {
-                e.preventDefault();
+        document
+            .querySelector('form[action="/inventory/bulk-insert"]')
+            .addEventListener('submit', function (e) {
+                const fileInput = document.getElementById('fileUpload');
+                if (!fileInput.files.length) {
+                    e.preventDefault();
+                    Toastify({
+                        text: "Silakan pilih file terlebih dahulu!",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "linear-gradient(to right, #ff0000, #ff4545)"
+                        }
+                    }).showToast();
+                }
+            });
+
+        // Download button functionality
+        document
+            .getElementById("btnDownloadData")
+            .addEventListener("click", () => {
+                window.location.href = "/inventory/download";
                 Toastify({
-                    text: "Silakan pilih file terlebih dahulu!",
-                    duration: 3000,
+                    text: "Download berhasil! Silakan cek folder download Anda.",
+                    duration: 5000,
                     close: true,
                     gravity: "top",
                     position: "right",
+                    stopOnFocus: true,
                     style: {
-                        background: "linear-gradient(to right, #ff0000, #ff4545)",
-                    }
+                        background: "linear-gradient(to right, #00b09b, #96c93d)",
+                        marginTop: "50px"
+                    },
+                    onClick: function () {}
                 }).showToast();
-            }
-        });
+            });
 
-        // Download button functionality
-        document.getElementById("btnDownloadData").addEventListener("click", () => {
-            window.location.href = "/inventory/download";
-            Toastify({
-                text: "Download berhasil! Silakan cek folder download Anda.",
-                duration: 5000,
-                close: true,
-                gravity: "top",
-                position: "right",
-                stopOnFocus: true,
-                style: {
-                    background: "linear-gradient(to right, #00b09b, #96c93d)",
-                    marginTop: "50px"
-                },
-                onClick: function () {}
-            }).showToast();
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const dropzone = document.getElementById('dropzone');
             const fileInput = document.getElementById('fileUpload');
             const fileNameDisplay = document.getElementById('fileName');
@@ -196,16 +206,26 @@
             const handleFileSelect = (files) => {
                 if (files.length) {
                     fileNameDisplay.textContent = files[0].name;
-                    dropzone.classList.add('file-selected');
-                    textDropzone.classList.add('d-none');
-                    chooseBtn.classList.add("d-none");
-                    fileNameDisplay.classList.remove('d-none');
-                    removeBtn.classList.remove('d-none');
+                    dropzone
+                        .classList
+                        .add('file-selected');
+                    textDropzone
+                        .classList
+                        .add('d-none');
+                    chooseBtn
+                        .classList
+                        .add("d-none");
+                    fileNameDisplay
+                        .classList
+                        .remove('d-none');
+                    removeBtn
+                        .classList
+                        .remove('d-none');
                 }
             };
 
             // Click handler
-            dropzone.addEventListener('click', function(e) {
+            dropzone.addEventListener('click', function (e) {
                 if (!dropzone.classList.contains('file-selected') && e.target.tagName !== 'INPUT') {
                     fileInput.click();
                 }
@@ -214,16 +234,22 @@
             // Drag & drop handlers
             dropzone.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                dropzone.classList.add('border-2', 'border-primary');
+                dropzone
+                    .classList
+                    .add('border-2', 'border-primary');
             });
 
             dropzone.addEventListener('dragleave', () => {
-                dropzone.classList.remove('border-2', 'border-primary');
+                dropzone
+                    .classList
+                    .remove('border-2', 'border-primary');
             });
 
             dropzone.addEventListener('drop', (e) => {
                 e.preventDefault();
-                dropzone.classList.remove('border-2', 'border-primary');
+                dropzone
+                    .classList
+                    .remove('border-2', 'border-primary');
                 handleFileSelect(e.dataTransfer.files);
                 fileInput.files = e.dataTransfer.files;
             });
@@ -238,56 +264,122 @@
                 e.stopPropagation();
                 fileInput.value = '';
                 fileNameDisplay.textContent = '';
-                dropzone.classList.remove('file-selected');
-                fileNameDisplay.classList.add('d-none');
-                textDropzone.classList.remove('d-none');
-                chooseBtn.classList.remove("d-none");
-                removeBtn.classList.add('d-none');
+                dropzone
+                    .classList
+                    .remove('file-selected');
+                fileNameDisplay
+                    .classList
+                    .add('d-none');
+                textDropzone
+                    .classList
+                    .remove('d-none');
+                chooseBtn
+                    .classList
+                    .remove("d-none");
+                removeBtn
+                    .classList
+                    .add('d-none');
 
             });
 
             // Reset when modal is closed
-            document.getElementById('uploadModal').addEventListener('hidden.bs.modal', () => {
-                fileInput.value = '';
-                fileNameDisplay.textContent = '';
-                dropzone.classList.remove('file-selected');
-                fileNameDisplay.classList.add('d-none');
-                textDropzone.classList.remove('d-none');
-                chooseBtn.classList.remove("d-none");
-                removeBtn.classList.add('d-none');
-            });
+            document
+                .getElementById('uploadModal')
+                .addEventListener('hidden.bs.modal', () => {
+                    fileInput.value = '';
+                    fileNameDisplay.textContent = '';
+                    dropzone
+                        .classList
+                        .remove('file-selected');
+                    fileNameDisplay
+                        .classList
+                        .add('d-none');
+                    textDropzone
+                        .classList
+                        .remove('d-none');
+                    chooseBtn
+                        .classList
+                        .remove("d-none");
+                    removeBtn
+                        .classList
+                        .add('d-none');
+                });
         });
 
         // Konfirmasi delete
         document.addEventListener("DOMContentLoaded", function () {
             let deleteForm;
 
-            document.querySelectorAll(".delete-btn").forEach(button => {
-                button.addEventListener("click", function (e) {
-                    e.preventDefault(); 
+            document
+                .querySelectorAll(".delete-btn")
+                .forEach(button => {
+                    button.addEventListener("click", function (e) {
+                        e.preventDefault();
 
-                    const itemName = this.getAttribute("data-name");
-                    deleteForm = this.closest("form");
+                        const itemName = this.getAttribute("data-name");
+                        deleteForm = this.closest("form");
 
-                    document.getElementById("deleteItemName").textContent = itemName;
+                        document
+                            .getElementById("deleteItemName")
+                            .textContent = itemName;
 
-                    const deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
-                    deleteModal.show();
+                        const deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"));
+                        deleteModal.show();
+                    });
                 });
-            });
 
-            document.getElementById("confirmDelete").addEventListener("click", function () {
-                if (deleteForm) {
-                    deleteForm.submit();
-                }
-            });
+            document
+                .getElementById("confirmDelete")
+                .addEventListener("click", function () {
+                    if (deleteForm) {
+                        deleteForm.submit();
+                    }
+                });
         });
-
 
         // Tambah button functionality
-        document.getElementById("btnTambah").addEventListener("click", () => {
-            window.location.href = "/inventory/add";
-        });
+        document
+            .getElementById("btnTambah")
+            .addEventListener("click", () => {
+                window.location.href = "/inventory/add";
+            });
+
+        document
+            .querySelectorAll('.qr-btn')
+            .forEach(button => {
+                button.addEventListener('click', async function () {
+                    const id = this.getAttribute('data-id');
+                    const nama = this.getAttribute('data-name');
+                    const deskripsi = this.getAttribute('data-desc');
+                    console.log('QR Button Clicked, ID:', id); // Debug: Pastikan ID benar
+
+                    try {
+                        console.log('Fetching QR code from:', `/inventory/generate-qr/${id}`);
+                        const response = await fetch(`/inventory/generate-qr/${id}`);
+                        console.log('Response Status:', response.status); // Debug: Status HTTP
+                        console.log('Response OK:', response.ok); // Debug: Apakah berhasil (200-299)
+
+                        const data = await response.json();
+                        console.log('Response Data:', data); // Debug: Lihat isi respons
+
+                        if (data.imageUrl) {
+                            Swal.fire({
+                                title: "QR Code",
+                                text: `QR Code untuk detail item ${nama} (${deskripsi})`,
+                                imageUrl: data.imageUrl,
+                                imageWidth: 200,
+                                imageHeight: 200,
+                                imageAlt: "QR Code"
+                            });
+                        } else {
+                            Swal.fire({title: "Error", text: "Gagal menghasilkan QR code: Tidak ada imageUrl", icon: "error"});
+                        }
+                    } catch (error) {
+                        console.error('Fetch Error:', error); // Debug: Tangkap kesalahan
+                        Swal.fire({title: "Error", text: "Terjadi kesalahan saat menghasilkan QR code", icon: "error"});
+                    }
+                });
+            });
     </script>
 {% endblock %}
 

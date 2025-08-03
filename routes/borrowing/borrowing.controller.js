@@ -66,7 +66,7 @@ const getPendingBorrowings = async (req, res) => {
 
 const loadBorrowForm = async (req, res) => {
     try {
-        const [inventories] = await db.query("SELECT * FROM inventories WHERE id NOT IN (SELECT inventory_id FROM borrowings WHERE status = 'Dipinjam')");
+        const [inventories] = await db.query("SELECT * FROM inventories WHERE id NOT IN (SELECT inventory_id FROM inventory_statuses WHERE status = 'Dipinjam' OR status = 'Maintenance' OR status = 'Lost') ORDER BY nama ASC");
         const [users] = await db.query("SELECT id, username FROM users");
         
         res.render("pages/borrowings/borrowForm", { inventories, users });

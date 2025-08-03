@@ -25,6 +25,31 @@ const getAdminPage = async (req, res) => {
     
     const [users] = await db.query(userQuery);
     const [inventories] = await db.query(inventoryQuery);
+    const inventoryGroups = {};
+
+    inventories.forEach(item => {
+      if (!inventoryGroups[item.nama]) {
+        inventoryGroups[item.nama] = {
+          nama: item.nama,
+          total: 0,
+          Tersedia: 0,
+          Dipinjam: 0,
+          Maintenance: 0,
+          Lost: 0
+        };
+      }
+      
+      // Menambah total
+      inventoryGroups[item.nama].total += 1;
+      
+      // Menambah jumlah berdasarkan status
+      if (item.status) {
+        inventoryGroups[item.nama][item.status] = (inventoryGroups[item.nama][item.status] || 0) + 1;
+      }
+    });
+    
+    // Mengubah objek menjadi array untuk template
+    const inventorySummary = Object.values(inventoryGroups);
 
     const borrowingStatsQuery = `
       SELECT 
@@ -164,6 +189,7 @@ const getAdminPage = async (req, res) => {
       title: "Dashboard - Omniflow",
       users,
       inventories,
+      inventorySummary,
       chartMonths: JSON.stringify(formattedMonths),
       chartBorrowingData: JSON.stringify(borrowingData),
       chartReturnData: JSON.stringify(returnData),

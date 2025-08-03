@@ -1,12 +1,8 @@
 {% set sidebarMenu = [
-    { "title": "Beranda", "icon": "fas fa-home", "url": "/" },
-    { "title": "Modul", "icon": "fas fa-folder", "url": "#", "submenus": [
-        { "title": "Gambaran Umum", "url": "/admin/overview" },
-        { "title": "Sub Modul", "url": "/admin/submodule" }
-    ], "activeCheck": "/admin" }
+    { "title": "Beranda", "icon": "fas fa-home", "url": "/" }
 ] %}
 
-{% if user.role in ['Admin', 'Manager'] %}
+{% if user.role in ['SuperAdmin', 'Manager', 'Admin'] %}
     {% set sidebarMenu = sidebarMenu.concat([
         { "title": "Inventory", "icon": "fas fa-boxes", "url": "#", "submenus": [
             { "title": "List Barang", "url": "/inventory/overview" },
@@ -14,13 +10,19 @@
             { "title": "Buat Pinjaman", "url": "/borrowings/add" },
             { "title": "Pengembalian Pinjaman", "url": "/borrowings/return" }, 
             { "title": "Riwayat Peminjaman", "url": "/borrowings" }
-        ], "activeCheck": "/inventory" },
+        ], "activeCheck": "/inventory" }
+    ]) %}
+{% endif %}
+
+{% if user.role in ['SuperAdmin'] %}
+{% set sidebarMenu = sidebarMenu.concat([
         { "title": "Internal", "icon": "fas fa-users", "url": "#", "submenus": [
             { "title": "List User", "url": "/user/index" },
             { "title": "User Overview ", "url": "/user/overview" }
         ], "activeCheck": "/Internal" },
         { "title": "Log", "icon": "fas fa-history", "url": "/log/index" }
     ]) %}
+
 {% endif %}
 
 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">

@@ -8,10 +8,10 @@ const insertUsersQuery = `
 
 const usersData = [
   {
-    username: "admin",
-    email: "admin@omniflow.id",
-    password: "Admin12345.",
-    role: "Admin",
+    username: "SuperAdmin",
+    email: "superadmin@omniflow.id",
+    password: "Superadmin12345.",
+    role: "SuperAdmin",
   },
   {
     username: "manager",
@@ -20,11 +20,17 @@ const usersData = [
     role: "Manager",
   },
   {
-    username: "user",
-    email: "user@omniflow.id",
-    password: "User12345.",
-    role: "User",
+    username: "admin inventaris",
+    email: "admininventaris@omniflow.id",
+    password: "AdminInventaris12345.",
+    role: "admin",
   },
+  // {
+  //   username: "user",
+  //   email: "user@omniflow.id",
+  //   password: "User12345.",
+  //   role: "User",
+  // },
   {
     username: "support",
     email: "support@omniflow.id",
@@ -41,7 +47,7 @@ const usersData = [
     username: "supervisor",
     email: "supervisor@omniflow.id",
     password: "Supervisor12345.",
-    role: "Manager",
+    role: "Supervisor",
   },
   {
     username: "teknisi",
@@ -155,6 +161,104 @@ const inventoryItems = [
     tanggal_pembelian: '2022-03-18',
     harga_pembelian: 8500000,
     status: 'Tersedia'
+  },
+  {
+    nama: 'Proyektor Epson EB-U05',
+    deskripsi: 'Proyektor Full HD dengan 3400 lumens',
+    tanggal_pembelian: '2022-04-22',
+    harga_pembelian: 9500000,
+    status: 'Lost'
+  },
+  {
+    nama: 'Laptop Asus TUF Gaming',
+    deskripsi: 'Laptop gaming dengan GTX 1650 Ti, 16GB RAM, 512GB SSD',
+    tanggal_pembelian: '2021-01-15',
+    harga_pembelian: 15000000,
+    status: 'Tersedia'
+  },
+  {
+    nama: 'Laptop MacBook Pro M1',
+    deskripsi: 'Laptop Apple dengan chip M1, 8GB RAM, 256GB SSD',
+    tanggal_pembelian: '2021-02-22',
+    harga_pembelian: 18000000,
+    status: 'Dipinjam'
+  },
+  {
+    nama: 'Smartphone Samsung Galaxy S21',
+    deskripsi: 'Smartphone Android dengan Snapdragon 888, 8GB RAM, 128GB Storage',
+    tanggal_pembelian: '2021-03-05',
+    harga_pembelian: 12000000,
+    status: 'Tersedia'
+  },
+  {
+    nama: 'Tablet iPad Pro 2021',
+    deskripsi: 'Tablet Apple dengan chip M1, 8GB RAM, 256GB Storage',
+    tanggal_pembelian: '2021-04-18',
+    harga_pembelian: 13000000,
+    status: 'Maintenance'
+  },
+  {
+    nama: 'Tablet Samsung Galaxy Tab S7',
+    deskripsi: 'Tablet Android dengan Snapdragon 865+, 6GB RAM, 128GB Storage',
+    tanggal_pembelian: '2021-05-20',
+    harga_pembelian: 9000000,
+    status: 'Tersedia'
+  },
+  {
+    nama: 'Smartwatch Apple Watch Series 7',
+    deskripsi: 'Smartwatch dengan layar always-on, GPS, water resistant',
+    tanggal_pembelian: '2021-11-05',
+    harga_pembelian: 6000000,
+    status: 'Dipinjam'
+  },
+  {
+    nama: 'Smartwatch Samsung Galaxy Watch 4',
+    deskripsi: 'Smartwatch dengan Wear OS, health monitoring, GPS',
+    tanggal_pembelian: '2021-09-15',
+    harga_pembelian: 4000000,
+    status: 'Tersedia'
+  },
+  {
+    nama: 'Kamera Sony Alpha 7 III',
+    deskripsi: 'Kamera mirrorless full-frame dengan 24.2MP',
+    tanggal_pembelian: '2021-07-10',
+    harga_pembelian: 25000000,
+    status: 'Maintenance'
+  },
+  {
+    nama: 'Kamera Canon EOS R6',
+    deskripsi: 'Kamera mirrorless full-frame dengan 20.1MP',
+    tanggal_pembelian: '2021-08-22',
+    harga_pembelian: 28000000,
+    status: 'Tersedia'
+  },
+  {
+    nama: 'Printer HP LaserJet Pro',
+    deskripsi: 'Printer laser monochrome dengan WiFi',
+    tanggal_pembelian: '2021-06-11',
+    harga_pembelian: 3500000,
+    status: 'Tersedia'
+  },
+  {
+    nama: 'Printer Epson L3150',
+    deskripsi: 'Printer inkjet multifungsi dengan tank system',
+    tanggal_pembelian: '2022-01-05',
+    harga_pembelian: 2800000,
+    status: 'Tersedia'
+  },
+  {
+    nama: 'Monitor Dell Ultrasharp 27"',
+    deskripsi: 'Monitor 4K dengan color accuracy tinggi',
+    tanggal_pembelian: '2022-02-10',
+    harga_pembelian: 7500000,
+    status: 'Maintenance'
+  },
+  {
+    nama: 'Monitor LG 34" Ultrawide',
+    deskripsi: 'Monitor ultrawide dengan resolusi 3440x1440, 144Hz',
+    tanggal_pembelian: '2022-03-18',
+    harga_pembelian: 8500000,
+    status: 'Lost'
   },
   {
     nama: 'Proyektor Epson EB-U05',
