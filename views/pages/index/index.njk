@@ -9,8 +9,8 @@
     </ol>
 
     <div class="row">
-      {% if user.role in ['SuperAdmin', 'Admin', 'Manager'] %}
-        <div class="col-xl-6">
+      {# {% if user.role in ['SuperAdmin', 'Admin', 'Manager'] %}
+        <div class="col-xl-6 col-md-12">
           <div class="card mb-4">
             <div class="card-header">
               <div class="d-flex justify-content-between align-items-center">
@@ -44,11 +44,12 @@
             </div>
           </div>
         </div>
-      {% endif %}
+      {% endif %} #}
 
-      {% if user.role === 'Supervisor' %}
-        <div class="col-xl-12">
-          <div class="card mb-4">
+      {% if user.role in ['Supervisor', 'SuperAdmin', 'Manager', 'Admin'] %}
+        {# <div class="col-xl-{% if user.role in ['SuperAdmin', 'Admin', 'Manager'] %}6{% else %}12{% endif %} col-md-6"> #}
+        <div class="col-xl-12 col-md-12">
+          <div class="card mb-4" id="Inventorycard">
             <div class="card-header">
               <div class="d-flex justify-content-between align-items-center">
                 <div>
@@ -66,7 +67,7 @@
                     <th>Stock</th>
                     <th>Tersedia</th>
                     <th>Dipinjam</th>
-                    <th>Maintenance</th>
+                    <th>Rusak</th>
                     <th>Lost</th>
                   </tr>
                 </thead>
@@ -89,9 +90,10 @@
             </div>
           </div>
         </div>
-    {% endif %}
+      {% endif %}
 
-    {% if user.role in ['SuperAdmin', 'User', 'Admin', 'Manager']%}
+
+      {% if user.role in ['User']%}
       <div class="col-xl-{% if user.role in ['SuperAdmin', 'Admin', 'Manager'] %}6{% else %}12{% endif %}">
         <div class="card mb-4">
           <div class="card-header">
@@ -137,355 +139,373 @@
         </div>
       </div>
     {% endif %}
+    </div>
+
+    {% if user.role in['SuperAdmin', 'Manager', 'Supervisor', 'Admin'] %}
+      <div class="row">
+        <div class="col-xl-6 col-md-12">
+          <div class="card mb-4">
+            <div class="card-header">
+              <i class="fas fa-chart-bar me-1"></i>
+            Statistik Peminjaman dan Pengembalian (12 Bulan Terakhir)
+          </div>
+            <div class="card-body d-flex justify-content-center">
+              <canvas id="borrowingReturnChart" style="width: 100%; height: 300px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-6 col-md-12">
+          <div class="card mb-4">
+            <div class="card-header">
+              <i class="fas fa-chart-pie me-1"></i>
+            Distribusi Status Barang
+          </div>
+            <div class="card-body d-flex justify-content-center">
+              <canvas id="inventoryStatusChart" style="width: 100%; height: 300px;"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-xl-6 col-md-12">
+          <div class="card mb-4">
+            <div class="card-header">
+              <i class="fas fa-users me-1"></i>
+            5 Pengguna Teratas yang Sering Meminjam
+          </div>
+            <div class="card-body d-flex justify-content-center">
+              <canvas id="frequentBorrowersChart" style="width: 100%; height: 300px;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-6 col-md-12">
+          <div class="card mb-4">
+            <div class="card-header">
+              <i class="fas fa-box me-1"></i>
+            5 Barang Teratas yang Sering Dipinjam
+          </div>
+            <div class="card-body d-flex justify-content-center">
+              <canvas id="frequentlyBorrowedChart" style="width: 100%; height: 300px;"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
   </div>
 
-  {% if user.role in['SuperAdmin', 'Manager', 'Supervisor', 'Admin'] %}
-    <div class="row">
-      <div class="col-xl-6 col-md-12">
-        <div class="card mb-4">
-          <div class="card-header">
-            <i class="fas fa-chart-bar me-1"></i>
-          Statistik Peminjaman dan Pengembalian (12 Bulan Terakhir)
-        </div>
-          <div class="card-body d-flex justify-content-center">
-            <canvas id="borrowingReturnChart" style="width: 100%; height: 300px;"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-xl-6 col-md-12">
-        <div class="card mb-4">
-          <div class="card-header">
-            <i class="fas fa-chart-pie me-1"></i>
-          Distribusi Status Barang
-        </div>
-          <div class="card-body d-flex justify-content-center">
-            <canvas id="inventoryStatusChart" style="width: 100%; height: 300px;"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-xl-6 col-md-12">
-        <div class="card mb-4">
-          <div class="card-header">
-            <i class="fas fa-users me-1"></i>
-          Pengguna yang Sering Meminjam
-        </div>
-          <div class="card-body d-flex justify-content-center">
-            <canvas id="frequentBorrowersChart" style="width: 100%; height: 300px;"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-xl-6 col-md-12">
-        <div class="card mb-4">
-          <div class="card-header">
-            <i class="fas fa-box me-1"></i>
-          Barang yang Sering Dipinjam
-        </div>
-          <div class="card-body d-flex justify-content-center">
-            <canvas id="frequentlyBorrowedChart" style="width: 100%; height: 300px;"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-  {% endif %}
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    // Initialize DataTables{% if user.role === 'SuperAdmin' or user.role === 'Manager' %}
-    $('#userTable').DataTable({
-      responsive: true,
-      language: {
-        search: "Search:",
-        lengthMenu: "Tampilkan _MENU_ data",
-        zeroRecords: "Tidak ada data yang ditemukan",
-        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-        infoEmpty: "Tidak ada data yang tersedia",
-        infoFiltered: "(disaring dari _MAX_ total data)",
-        paginate: {
-          first: "<i class='fas fa-angle-double-left'></i>",
-          last: "<i class='fas fa-angle-double-right'></i>",
-          next: "<i class='fas fa-chevron-right'></i>",
-          previous: "<i class='fas fa-chevron-left'></i>"
-        }
-      },
-      pageLength: 5,
-      lengthMenu: [5, 10, 25, 50, 100]
-    });
-  {% endif %}
-
-  $('#inventoryTable').DataTable({
-    responsive: true,
-    language: {
-      search: "Search:",
-      lengthMenu: "Tampilkan _MENU_ data",
-      zeroRecords: "Tidak ada data yang ditemukan",
-      info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-      infoEmpty: "Tidak ada data yang tersedia",
-      infoFiltered: "(disaring dari _MAX_ total data)",
-      paginate: {
-        first: "<i class='fas fa-angle-double-left'></i>",
-        last: "<i class='fas fa-angle-double-right'></i>",
-        next: "<i class='fas fa-chevron-right'></i>",
-        previous: "<i class='fas fa-chevron-left'></i>"
-      }
-    },
-    pageLength: 5,
-    lengthMenu: [5, 10, 25, 50, 100]
-  });
-
-  {% if user.role === 'Supervisor' %}
-    $('#supervisorInventoryTable').DataTable({
-      responsive: true,
-      language: {
-        search: "Search:",
-        lengthMenu: "Tampilkan _MENU_ data",
-        zeroRecords: "Tidak ada data yang ditemukan",
-        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-        infoEmpty: "Tidak ada data yang tersedia",
-        infoFiltered: "(disaring dari _MAX_ total data)",
-        paginate: {
-          first: "<i class='fas fa-angle-double-left'></i>",
-          last: "<i class='fas fa-angle-double-right'></i>",
-          next: "<i class='fas fa-chevron-right'></i>",
-          previous: "<i class='fas fa-chevron-left'></i>"
-        }
-      },
-      pageLength: 10,
-      lengthMenu: [5, 10, 25, 50, 100]
-    });
-  {% endif %}
-
-  {% if user.role in ['SuperAdmin', 'Manager', 'Supervisor', 'Admin'] %}
-    const borrowingCtx = document.getElementById('borrowingReturnChart');
-    if (borrowingCtx) {
-      try {
-        const months = {{ chartMonths | safe }};
-        const borrowingData = {{ chartBorrowingData | safe }};
-        const returnData = {{ chartReturnData | safe }};
-
-        new Chart(borrowingCtx, {
-          type: 'bar',
-          data: {
-            labels: months,
-            datasets: [
-              {
-                label: 'Total Peminjaman',
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                borderColor: 'rgb(54, 162, 235)',
-                borderWidth: 1,
-                data: borrowingData
-              }, {
-                label: 'Total Pengembalian',
-                backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                borderColor: 'rgb(75, 192, 192)',
-                borderWidth: 1,
-                data: returnData
-              }
-            ]
-          },
-          options: {
-            maintainAspectRatio: false,
-            responsive: true,
-            scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  precision: 0
-                }
-              }
-            },
-            plugins: {
-              legend: {
-                position: 'top'
-              },
-              tooltip: {
-                callbacks: {
-                  title: function (tooltipItems) {
-                    return tooltipItems[0].label;
-                  },
-                  label: function (context) {
-                    return context.dataset.label + ': ' + context.raw + ' barang';
-                  }
-                }
-              }
-            }
-          }
-        });
-      } catch (error) {
-        console.error('Error initializing borrowing chart:', error);
-      }
+  <style>
+    .card{
+      max-width: 100%;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
-
-    const statusCtx = document.getElementById('inventoryStatusChart');
-    if (statusCtx) {
-      try {
-        const statusLabels = {{ statusLabels | safe }};
-        const statusData = {{ statusData | safe }};
-        const statusColors = {{ statusColors | safe }};
-
-        new Chart(statusCtx, {
-          type: 'pie',
-          data: {
-            labels: statusLabels,
-            datasets: [
-              {
-                data: statusData,
-                backgroundColor: statusColors,
-                borderColor: statusColors.map(color => color.replace('0.8', '1')),
-                borderWidth: 1
-              }
-            ]
-          },
-          options: {
-            maintainAspectRatio: false,
-            responsive: true,
-            plugins: {
-              legend: {
-                position: 'bottom'
-              },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    const label = context.label || '';
-                    const value = context.raw || 0;
-                    const total = context
-                      .dataset
-                      .data
-                      .reduce((acc, curr) => acc + curr, 0);
-                    const percentage = Math.round((value / total) * 100);
-                    return `${label}: ${value} (${percentage}%)`;
-                  }
-                }
-              }
-            }
-          }
-        });
-      } catch (error) {
-        console.error('Error initializing status chart:', error);
-      }
-    }
-
-    const borrowersCtx = document.getElementById('frequentBorrowersChart');
-    if (borrowersCtx) {
-      try {
-        const borrowerNames = {{ borrowerNames | safe }};
-        const borrowerCounts = {{ borrowerCounts | safe }};
-
-        new Chart(borrowersCtx, {
-          type: 'bar',
-          data: {
-            labels: borrowerNames,
-            datasets: [
-              {
-                label: 'Jumlah Peminjaman',
-                backgroundColor: 'rgba(255, 159, 64, 0.7)',
-                borderColor: 'rgb(255, 159, 64)',
-                borderWidth: 1,
-                data: borrowerCounts
-              }
-            ]
-          },
-          options: {
-            maintainAspectRatio: false,
-            indexAxis: 'y',
-            responsive: true,
-            scales: {
-              x: {
-                beginAtZero: true,
-                ticks: {
-                  precision: 0
-                }
-              }
-            },
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                callbacks: {
-                  title: function (tooltipItems) {
-                    return tooltipItems[0].label;
-                  },
-                  label: function (context) {
-                    return 'Jumlah Peminjaman: ' + context.raw + ' kali';
-                  }
-                }
-              }
-            }
-          }
-        });
-      } catch (error) {
-        console.error('Error initializing frequent borrowers chart:', error);
-      }
-    }
-
-    const borrowedItemsCtx = document.getElementById('frequentlyBorrowedChart');
-    if (borrowedItemsCtx) {
-      try {
-        const itemNames = {{ itemNames | safe }};
-        const itemBorrowCounts = {{ itemBorrowCounts | safe }};
-
-        new Chart(borrowedItemsCtx, {
-          type: 'bar',
-          data: {
-            labels: itemNames,
-            datasets: [
-              {
-                label: 'Jumlah Peminjaman',
-                backgroundColor: 'rgba(153, 102, 255, 0.7)',
-                borderColor: 'rgb(153, 102, 255)',
-                borderWidth: 1,
-                data: itemBorrowCounts
-              }
-            ]
-          },
-          options: {
-            maintainAspectRatio: false,
-            indexAxis: 'y',
-            responsive: true,
-            scales: {
-              x: {
-                beginAtZero: true,
-                ticks: {
-                  precision: 0
-                }
-              }
-            },
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                callbacks: {
-                  title: function (tooltipItems) {
-                    return tooltipItems[0].label;
-                  },
-                  label: function (context) {
-                    return 'Jumlah Peminjaman: ' + context.raw + ' kali';
-                  }
-                }
-              }
-            }
-          }
-        });
-      } catch (error) {
-        console.error('Error initializing frequently borrowed items chart:', error);
-      }
-    }
-  {% endif %}
-});
-</script>
+    </style>
 {% endblock %}
 
 {% block scripts %}
+{# <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script> #}
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script>
-  $(document).ready(function () {});
+    document.addEventListener('DOMContentLoaded', function () {
+      {# // Initialize DataTables
+      {% if user.role === 'SuperAdmin' or user.role === 'Manager' %}
+      $('#userTable').DataTable({
+        responsive: true,
+        language: {
+          search: "Search:",
+          lengthMenu: "Tampilkan _MENU_ data",
+          zeroRecords: "Tidak ada data yang ditemukan",
+          info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+          infoEmpty: "Tidak ada data yang tersedia",
+          infoFiltered: "(disaring dari _MAX_ total data)",
+          paginate: {
+            first: "<i class='fas fa-angle-double-left'></i>",
+            last: "<i class='fas fa-angle-double-right'></i>",
+            next: "<i class='fas fa-chevron-right'></i>",
+            previous: "<i class='fas fa-chevron-left'></i>"
+          }
+        },
+        pageLength: 5,
+        lengthMenu: [5, 10, 25, 50, 100]
+      });
+      {% endif %} #}
+
+      $('#inventoryTable').DataTable({
+        responsive: true,
+        language: {
+          search: "Search:",
+          lengthMenu: "Tampilkan _MENU_ data",
+          zeroRecords: "Tidak ada data yang ditemukan",
+          info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+          infoEmpty: "Tidak ada data yang tersedia",
+          infoFiltered: "(disaring dari _MAX_ total data)",
+          paginate: {
+            first: "<i class='fas fa-angle-double-left'></i>",
+            last: "<i class='fas fa-angle-double-right'></i>",
+            next: "<i class='fas fa-chevron-right'></i>",
+            previous: "<i class='fas fa-chevron-left'></i>"
+          }
+        },
+        pageLength: 10,
+        lengthMenu: [5, 10, 25, 50, 100]
+      });
+
+      {% if user.role in ['Supervisor', 'SuperAdmin', 'Admin', 'Manager'] %}
+      $('#supervisorInventoryTable').DataTable({
+        responsive: true,
+        language: {
+          search: "Search:",
+          lengthMenu: "Tampilkan _MENU_ data",
+          zeroRecords: "Tidak ada data yang ditemukan",
+          info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+          infoEmpty: "Tidak ada data yang tersedia",
+          infoFiltered: "(disaring dari _MAX_ total data)",
+          paginate: {
+            first: "<i class='fas fa-angle-double-left'></i>",
+            last: "<i class='fas fa-angle-double-right'></i>",
+            next: "<i class='fas fa-chevron-right'></i>",
+            previous: "<i class='fas fa-chevron-left'></i>"
+          }
+        },
+        pageLength: 5,
+        lengthMenu: [5, 10, 25, 50, 100]
+      });
+      {% endif %}
+
+      {% if user.role in ['SuperAdmin', 'Manager', 'Supervisor', 'Admin'] %}
+      const borrowingCtx = document.getElementById('borrowingReturnChart');
+      if (borrowingCtx) {
+        try {
+          const months = {{ chartMonths | safe }};
+          const borrowingData = {{ chartBorrowingData | safe }};
+          const perfectReturnData = {{ chartPerfectReturnData | safe }};
+
+          new Chart(borrowingCtx, {
+            type: 'line',
+            data: {
+              labels: months,
+              datasets: [
+                {
+                  label: 'Total Peminjaman',
+                  backgroundColor: 'rgba(255, 0, 0, 0.2)',
+                  borderColor: 'rgb(255, 0, 0)',
+                  borderWidth: 2,
+                  data: borrowingData,
+                  fill: false
+                }, {
+                  label: 'Total Pengembalian',
+                  backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                  borderColor: 'rgb(255, 206, 86)',
+                  borderWidth: 2,
+                  data: perfectReturnData,
+                  fill: false
+                }
+              ]
+            },
+            options: {
+              maintainAspectRatio: false,
+              responsive: true,
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: {
+                    precision: 0
+                  }
+                }
+              },
+              plugins: {
+                legend: {
+                  position: 'top'
+                },
+                tooltip: {
+                  callbacks: {
+                    title: function (tooltipItems) {
+                      return tooltipItems[0].label;
+                    },
+                    label: function (context) {
+                      return context.dataset.label + ': ' + context.raw + ' barang';
+                    }
+                  }
+                }
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error initializing borrowing chart:', error);
+        }
+      };
+
+      const statusCtx = document.getElementById('inventoryStatusChart');
+      if (statusCtx) {
+        try {
+          const statusLabels = {{ statusLabels | safe }};
+          const statusData = {{ statusData | safe }};
+          const statusColors = {{ statusColors | safe }};
+
+          new Chart(statusCtx, {
+            type: 'pie',
+            data: {
+              labels: statusLabels,
+              datasets: [
+                {
+                  data: statusData,
+                  backgroundColor: statusColors,
+                  borderColor: statusColors.map(color => color.replace('0.8', '1')),
+                  borderWidth: 1
+                }
+              ]
+            },
+            options: {
+              maintainAspectRatio: false,
+              responsive: true,
+              plugins: {
+                legend: {
+                  position: 'bottom'
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      const label = context.label || '';
+                      const value = context.raw || 0;
+                      const total = context
+                        .dataset
+                        .data
+                        .reduce((acc, curr) => acc + curr, 0);
+                      const percentage = Math.round((value / total) * 100);
+                      return `${label}: ${value} (${percentage}%)`;
+                    }
+                  }
+                },
+                datalabels: { // Konfigurasi untuk chartjs-plugin-datalabels
+                  color: '#fff', // Warna teks label
+                  formatter: (value, context) => {
+                    const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    const percentage = Math.round((value / total) * 100);
+                    return percentage + '%';
+                  }
+                }
+              }
+            },
+            plugins: [ChartDataLabels] // Daftarkan plugin di sini
+          });
+        } catch (error) {
+          console.error('Error initializing status chart:', error);
+        }
+      };
+
+      const borrowersCtx = document.getElementById('frequentBorrowersChart');
+      if (borrowersCtx) {
+        try {
+          const borrowerNames = {{ borrowerNames | safe }};
+          const borrowerCounts = {{ borrowerCounts | safe }};
+
+          new Chart(borrowersCtx, {
+            type: 'bar',
+            data: {
+              labels: borrowerNames,
+              datasets: [
+                {
+                  label: 'Jumlah Peminjaman',
+                  backgroundColor: 'rgba(255, 159, 64, 0.7)',
+                  borderColor: 'rgb(255, 159, 64)',
+                  borderWidth: 1,
+                  data: borrowerCounts
+                }
+              ]
+            },
+            options: {
+              maintainAspectRatio: false,
+              indexAxis: 'y',
+              responsive: true,
+              scales: {
+                x: {
+                  beginAtZero: true,
+                  ticks: {
+                    precision: 0
+                  }
+                }
+              },
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    title: function (tooltipItems) {
+                      return tooltipItems[0].label;
+                    },
+                    label: function (context) {
+                      return 'Jumlah Peminjaman: ' + context.raw + ' kali';
+                    }
+                  }
+                }
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error initializing frequent borrowers chart:', error);
+        }
+      };
+
+      const borrowedItemsCtx = document.getElementById('frequentlyBorrowedChart');
+      if (borrowedItemsCtx) {
+        try {
+          const itemNames = {{ itemNames | safe }};
+          const itemBorrowCounts = {{ itemBorrowCounts | safe }};
+
+          new Chart(borrowedItemsCtx, {
+            type: 'bar',
+            data: {
+              labels: itemNames,
+              datasets: [
+                {
+                  label: 'Jumlah Peminjaman',
+                  backgroundColor: 'rgba(153, 102, 255, 0.7)',
+                  borderColor: 'rgb(153, 102, 255)',
+                  borderWidth: 1,
+                  data: itemBorrowCounts
+                }
+              ]
+            },
+            options: {
+              maintainAspectRatio: false,
+              indexAxis: 'y',
+              responsive: true,
+              scales: {
+                x: {
+                  beginAtZero: true,
+                  ticks: {
+                    precision: 0
+                  }
+                }
+              },
+              plugins: {
+                legend: {
+                  display: false
+                },
+                tooltip: {
+                  callbacks: {
+                    title: function (tooltipItems) {
+                      return tooltipItems[0].label;
+                    },
+                    label: function (context) {
+                      return 'Jumlah Peminjaman: ' + context.raw + ' kali';
+                    }
+                  }
+                }
+              }
+            }
+          });
+        } catch (error) {
+          console.error('Error initializing frequently borrowed items chart:', error);
+        }
+      }
+      {% endif %}
+    });
 </script>
 {% endblock %}

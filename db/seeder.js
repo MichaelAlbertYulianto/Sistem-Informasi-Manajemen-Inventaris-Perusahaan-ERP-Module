@@ -269,13 +269,37 @@ const inventoryItems = [
   }
 ];
 
+const seedBorrowingLogs = async () => {
+  try {
+    console.log("Seeding borrowing logs...");
+
+    // Fetch existing inventory and user IDs
+    const [inventories] = await db.query("SELECT id FROM inventories");
+    const [users] = await db.query("SELECT id FROM users");
+
+    if (inventories.length === 0 || users.length === 0) {
+      console.warn("No inventories or users found. Skipping borrowing_logs seeding.");
+      return;
+    }
+
+    // Move borrowingLogsData definition outside this function if it's used globally
+    // For now, it's defined here and used within this function's scope.
+
+
+
+  } catch (error) {
+    console.error("Error seeding borrowing logs:", error);
+  }
+};
+
 const createBorrowingsData = () => {
   const borrowings = [];
   
   borrowings.push({
     inventory_id: 2,
     user_id: 3,
-    borrow_date: '2025-03-10 09:00:00',
+    request_date: "2025-03-09 10:00:00", // Perbaikan format tanggal
+    take_date: "2025-03-10 09:00:00",
     return_date: null,
     status: 'Dipinjam'
   });
@@ -283,7 +307,8 @@ const createBorrowingsData = () => {
   borrowings.push({
     inventory_id: 7,
     user_id: 2,
-    borrow_date: '2025-03-12 14:30:00',
+    request_date: "2025-03-10 14:00:00",
+    take_date: "2025-03-12 14:30:00",
     return_date: null,
     status: 'Dipinjam'
   });
@@ -291,31 +316,455 @@ const createBorrowingsData = () => {
   borrowings.push({
     inventory_id: 12,
     user_id: 7,
-    borrow_date: '2025-03-13 11:15:00',
+    request_date: "2025-03-11 13:30:00",
+    take_date: "2025-03-13 11:15:00",
     return_date: null,
     status: 'Dipinjam'
   });
   
-  borrowings.push({
-    inventory_id: 3,
-    user_id: 4,
-    borrow_date: '2025-03-01 10:00:00',
-    return_date: '2025-03-15 16:45:00',
-    status: 'Dikembalikan'
-  });
-  
-  borrowings.push({
-    inventory_id: 13,
-    user_id: 8,
-    borrow_date: '2025-02-25 08:30:00',
-    return_date: '2025-03-10 09:15:00',
-    status: 'Dikembalikan'
-  });
   
   return borrowings;
 };
 
+
+
 const borrowingsData = createBorrowingsData();
+
+// Define borrowingLogsData globally or pass it as an argument if needed elsewhere
+const borrowingLogsData = [
+  {
+    inventory_id: 1,
+    user_id: 4,
+    request_date: "2024-08-12 10:00:00",
+    take_date: "2024-08-13 11:00:00",
+    return_date: "2024-08-16 15:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 2,
+    user_id: 2,
+    request_date: "2024-08-18 09:00:00",
+    take_date: "2024-08-19 10:00:00",
+    return_date: "2024-08-20 10:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 3,
+    user_id: 7,
+    request_date: "2024-08-22 14:00:00",
+    take_date: "2024-08-23 14:00:00",
+    return_date: "2024-08-25 14:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 4,
+    user_id: 8,
+    request_date: "2024-08-27 16:00:00",
+    take_date: "2024-08-28 09:00:00",
+    return_date: "2024-09-01 13:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 18,
+    user_id: 4,
+    request_date: "2024-09-05 11:30:00",
+    take_date: "2024-09-06 12:00:00",
+    return_date: "2024-09-10 14:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 25,
+    user_id: 5,
+    request_date: "2024-09-08 08:00:00",
+    take_date: "2024-09-09 09:00:00",
+    return_date: "2024-09-12 10:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 7,
+    user_id: 7,
+    request_date: "2024-09-15 15:00:00",
+    take_date: "2024-09-16 16:00:00",
+    return_date: "2024-09-19 17:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 12,
+    user_id: 8,
+    request_date: "2024-09-20 10:00:00",
+    take_date: "2024-09-21 11:00:00",
+    return_date: "2024-09-24 12:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 29,
+    user_id: 4,
+    request_date: "2024-09-25 14:00:00",
+    take_date: "2024-09-26 15:00:00",
+    return_date: "2024-09-26 15:00:00",
+    item_condition: "Hilang",
+  },
+  {
+    inventory_id: 20,
+    user_id: 5,
+    request_date: "2024-10-01 09:00:00",
+    take_date: "2024-10-02 10:00:00",
+    return_date: "2024-10-05 11:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 5,
+    user_id: 7,
+    request_date: "2024-10-06 13:00:00",
+    take_date: "2024-10-07 14:00:00",
+    return_date: "2024-10-10 15:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 23,
+    user_id: 8,
+    request_date: "2024-10-12 16:00:00",
+    take_date: "2024-10-13 17:00:00",
+    return_date: "2024-10-16 18:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 8,
+    user_id: 4,
+    request_date: "2024-10-18 10:00:00",
+    take_date: "2024-10-19 11:00:00",
+    return_date: "2024-10-22 12:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 2,
+    user_id: 5,
+    request_date: "2024-10-25 14:00:00",
+    take_date: "2024-10-26 15:00:00",
+    return_date: "2024-10-29 16:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 15,
+    user_id: 7,
+    request_date: "2024-11-01 11:00:00",
+    take_date: "2024-11-02 12:00:00",
+    return_date: "2024-11-02 12:00:00",
+    item_condition: "Hilang",
+  },
+  {
+    inventory_id: 26,
+    user_id: 8,
+    request_date: "2024-11-05 09:00:00",
+    take_date: "2024-11-06 10:00:00",
+    return_date: "2024-11-09 11:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 9,
+    user_id: 4,
+    request_date: "2024-11-12 15:00:00",
+    take_date: "2024-11-13 16:00:00",
+    return_date: "2024-11-16 17:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 21,
+    user_id: 5,
+    request_date: "2024-11-18 12:00:00",
+    take_date: "2024-11-19 13:00:00",
+    return_date: "2024-11-22 14:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 10,
+    user_id: 7,
+    request_date: "2024-11-25 10:00:00",
+    take_date: "2024-11-26 11:00:00",
+    return_date: "2024-11-29 12:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 28,
+    user_id: 8,
+    request_date: "2024-12-01 14:00:00",
+    take_date: "2024-12-02 15:00:00",
+    return_date: "2024-12-02 15:00:00",
+    item_condition: "Hilang",
+  },
+  {
+    inventory_id: 4,
+    user_id: 4,
+    request_date: "2024-12-05 09:00:00",
+    take_date: "2024-12-06 10:00:00",
+    return_date: "2024-12-09 11:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 17,
+    user_id: 5,
+    request_date: "2024-12-11 11:00:00",
+    take_date: "2024-12-12 12:00:00",
+    return_date: "2024-12-15 13:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 1,
+    user_id: 7,
+    request_date: "2024-12-18 15:00:00",
+    take_date: "2024-12-19 16:00:00",
+    return_date: "2024-12-22 17:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 24,
+    user_id: 8,
+    request_date: "2024-12-25 10:00:00",
+    take_date: "2024-12-26 11:00:00",
+    return_date: "2024-12-29 12:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 13,
+    user_id: 4,
+    request_date: "2025-01-01 13:00:00",
+    take_date: "2025-01-02 14:00:00",
+    return_date: "2025-01-05 15:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 27,
+    user_id: 5,
+    request_date: "2025-01-08 16:00:00",
+    take_date: "2025-01-09 17:00:00",
+    return_date: "2025-01-12 18:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 6,
+    user_id: 7,
+    request_date: "2025-01-15 09:00:00",
+    take_date: "2025-01-16 10:00:00",
+    return_date: "2025-01-19 11:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 19,
+    user_id: 8,
+    request_date: "2025-01-22 11:00:00",
+    take_date: "2025-01-23 12:00:00",
+    return_date: "2025-01-26 13:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 2,
+    user_id: 4,
+    request_date: "2025-01-29 14:00:00",
+    take_date: "2025-01-30 15:00:00",
+    return_date: "2025-02-02 16:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 11,
+    user_id: 5,
+    request_date: "2025-02-05 10:00:00",
+    take_date: "2025-02-06 11:00:00",
+    return_date: "2025-02-09 12:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 22,
+    user_id: 7,
+    request_date: "2025-02-12 13:00:00",
+    take_date: "2025-02-13 14:00:00",
+    return_date: "2025-02-16 15:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 16,
+    user_id: 4,
+    request_date: "2025-02-22 10:00:00",
+    take_date: "2025-02-23 11:00:00",
+    return_date: "2025-02-26 12:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 25,
+    user_id: 5,
+    request_date: "2025-03-01 14:00:00",
+    take_date: "2025-03-02 15:00:00",
+    return_date: "2025-03-05 16:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 8,
+    user_id: 7,
+    request_date: "2025-03-08 09:00:00",
+    take_date: "2025-03-09 10:00:00",
+    return_date: "2025-03-12 11:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 12,
+    user_id: 8,
+    request_date: "2025-03-15 11:00:00",
+    take_date: "2025-03-16 12:00:00",
+    return_date: "2025-03-19 13:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 20,
+    user_id: 4,
+    request_date: "2025-03-22 15:00:00",
+    take_date: "2025-03-23 16:00:00",
+    return_date: "2025-03-26 17:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 5,
+    user_id: 5,
+    request_date: "2025-03-29 10:00:00",
+    take_date: "2025-03-30 11:00:00",
+    return_date: "2025-04-02 12:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 14,
+    user_id: 8,
+    request_date: "2025-04-08 16:00:00",
+    take_date: "2025-04-09 17:00:00",
+    return_date: "2025-04-12 18:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 21,
+    user_id: 4,
+    request_date: "2025-04-15 09:00:00",
+    take_date: "2025-04-16 10:00:00",
+    return_date: "2025-04-19 11:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 9,
+    user_id: 5,
+    request_date: "2025-04-22 11:00:00",
+    take_date: "2025-04-23 12:00:00",
+    return_date: "2025-04-26 13:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 23,
+    user_id: 7,
+    request_date: "2025-04-29 15:00:00",
+    take_date: "2025-04-30 16:00:00",
+    return_date: "2025-05-03 17:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 18,
+    user_id: 8,
+    request_date: "2025-05-06 10:00:00",
+    take_date: "2025-05-07 11:00:00",
+    return_date: "2025-05-10 12:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 2,
+    user_id: 4,
+    request_date: "2025-05-13 13:00:00",
+    take_date: "2025-05-14 14:00:00",
+    return_date: "2025-05-17 15:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 24,
+    user_id: 7,
+    request_date: "2025-05-23 09:00:00",
+    take_date: "2025-05-24 10:00:00",
+    return_date: "2025-05-27 11:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 6,
+    user_id: 8,
+    request_date: "2025-05-30 11:00:00",
+    take_date: "2025-05-31 12:00:00",
+    return_date: "2025-06-03 13:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 19,
+    user_id: 4,
+    request_date: "2025-06-06 14:00:00",
+    take_date: "2025-06-07 15:00:00",
+    return_date: "2025-06-10 16:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 10,
+    user_id: 5,
+    request_date: "2025-06-13 16:00:00",
+    take_date: "2025-06-14 17:00:00",
+    return_date: "2025-06-17 18:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 14,
+    user_id: 8,
+    request_date: "2025-06-22 13:00:00",
+    take_date: "2025-06-23 14:00:00",
+    return_date: "2025-07-25 15:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 16,
+    user_id: 4,
+    request_date: "2025-06-27 16:00:00",
+    take_date: "2025-06-28 17:00:00",
+    return_date: "2025-07-30 18:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 9,
+    user_id: 2,
+    request_date: "2025-07-02 09:00:00",
+    take_date: "2025-07-03 10:00:00",
+    return_date: "2025-07-06 11:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 13,
+    user_id: 7,
+    request_date: "2025-07-09 11:00:00",
+    take_date: "2025-07-10 12:00:00",
+    return_date: "2025-07-13 13:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 22,
+    user_id: 8,
+    request_date: "2025-07-15 14:00:00",
+    take_date: "2025-07-16 15:00:00",
+    return_date: "2025-07-19 16:00:00",
+    item_condition: "Rusak",
+  },
+  {
+    inventory_id: 2,
+    user_id: 4,
+    request_date: "2025-07-22 10:00:00",
+    take_date: "2025-07-23 11:00:00",
+    return_date: "2025-07-26 12:00:00",
+    item_condition: "Sempurna",
+  },
+  {
+    inventory_id: 26,
+    user_id: 2,
+    request_date: "2025-07-25 13:00:00",
+    take_date: "2025-07-26 14:00:00",
+    return_date: "2025-07-29 15:00:00",
+    item_condition: "Sempurna",
+  },
+];
 
 async function runSeeder() {
   try {
@@ -350,24 +799,25 @@ async function runSeeder() {
     }
     console.log("Seeded inventory_statuses table.");
     
-    console.log("Seeding inventory_logs table...");
-    for (let i = 0; i < inventoryItems.length; i++) {
-      await db.query(
-        `INSERT INTO inventory_logs (inventory_id, user_id, activity) VALUES (?, ?, ?)`,
-        [i + 1, 1, `Added new inventory: ${inventoryItems[i].nama}`]
-      );
-    }
-    console.log("Seeded inventory_logs table.");
+    // console.log("Seeding inventory_logs table...");
+    // for (let i = 0; i < inventoryItems.length; i++) {
+    //   await db.query(
+    //     `INSERT INTO inventory_logs (inventory_id, user_id, activity) VALUES (?, ?, ?)`,
+    //     [i + 1, 1, `Added new inventory: ${inventoryItems[i].nama}`]
+    //   );
+    // }
+    // console.log("Seeded inventory_logs table.");
     
     console.log("Seeding borrowings table...");
     for (let borrowing of borrowingsData) {
       await db.query(
-        `INSERT INTO borrowings (inventory_id, user_id, borrow_date, return_date, status) 
-         VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO borrowings (inventory_id, user_id,request_date, take_date, return_date, status) 
+         VALUES (?, ?, ?, ?, ?, ?)`,
         [
           borrowing.inventory_id,
           borrowing.user_id,
-          borrowing.borrow_date,
+          borrowing.request_date, 
+          borrowing.take_date,
           borrowing.return_date,
           borrowing.status
         ]
@@ -375,6 +825,21 @@ async function runSeeder() {
     }
     console.log("Seeded borrowings table.");
     
+    for (const log of borrowingLogsData) {
+      await db.query(
+        "INSERT INTO borrowing_logs (inventory_id, user_id, request_date, take_date, return_date, item_condition) VALUES (?, ?, ?, ?, ?, ?)",
+        [
+          log.inventory_id,
+          log.user_id,
+          log.request_date,
+          log.take_date,
+          log.return_date,
+          log.item_condition,
+        ]
+      );
+    }
+    console.log("Borrowing logs seeded successfully.");
+
     console.log("All seeding completed successfully!");
 
   } catch (err) {
@@ -385,4 +850,20 @@ async function runSeeder() {
   }
 }
 
+
+
 runSeeder();
+
+
+
+
+const seedAll = async () => {
+  await seedUsers();
+  await seedInventories();
+  await seedInventoryStatuses();
+  await seedBorrowingLogs(); // Add this line
+};
+
+module.exports = {
+  seedAll,
+};

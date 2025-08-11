@@ -18,6 +18,7 @@ app.use(
           "'unsafe-inline'",
           "cdn.jsdelivr.net",
           "use.fontawesome.com",
+          "cdnjs.cloudflare.com" 
         ],
         objectSrc: ["'none'"],
         upgradeInsecureRequests: [],
@@ -88,6 +89,7 @@ const userRouter = require("./routes/user/user.router");
 const logRouter = require("./routes/log/log.router");
 const inventoryRouter = require("./routes/inventory/inventory.router");
 const borrowingRouter = require("./routes/borrowing/borrowing.router");
+const requestBorrowRouter = require("./routes/requestBorrow/request.router");
 
 app.use("/", authRouter);
 app.use("/", isLoggedIn, adminRouter);
@@ -95,6 +97,7 @@ app.use("/", isLoggedIn, userRouter);
 app.use("/", isLoggedIn, logRouter);
 app.use("/", isLoggedIn, inventoryRouter);
 app.use("/", isLoggedIn, borrowingRouter);
+app.use("/", isLoggedIn, requestBorrowRouter);
 
 const errorHandler = require("./middlewares/errorHandler");
 app.use(errorHandler);

@@ -11195,6 +11195,29 @@ body {
   padding-right: 1rem;
 }
 
+/* Ensure DataTables tables take full width of their parent container */
+.card-body .dataTables_wrapper {
+    width: 100%;
+}
+
+.card-body .dataTables_wrapper table {
+    width: 100%;
+    /* Add table-layout fixed to prevent columns from overflowing */
+    table-layout: fixed;
+}
+
+.card-body .dataTables_wrapper .dataTables_scrollBody, 
+.card-body .dataTables_wrapper .dataTables_scrollHeadInner, 
+.card-body .dataTables_wrapper .dataTables_scrollHeadInner table {
+    width: 100% !important;
+}
+
+/* Adjust search input width if it's still an issue */
+.dataTables_filter input {
+    width: 100% !important;
+    box-sizing: border-box; /* Include padding and border in the element's total width */
+}
+
 .datatable-sorter::before,
 .datatable-sorter::after {
   content: "";

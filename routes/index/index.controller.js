@@ -7,7 +7,7 @@ const getAdminPage = async (req, res) => {
       FROM users
       ORDER BY id
     `;
-    
+
     const inventoryQuery = `
       SELECT i.id, i.nama, s.status
       FROM inventories i
@@ -22,7 +22,7 @@ const getAdminPage = async (req, res) => {
       ) s ON i.id = s.inventory_id
       ORDER BY i.id
     `;
-    
+
     const [users] = await db.query(userQuery);
     const [inventories] = await db.query(inventoryQuery);
     const inventoryGroups = {};
@@ -38,71 +38,73 @@ const getAdminPage = async (req, res) => {
           Lost: 0
         };
       }
-      
+
       // Menambah total
       inventoryGroups[item.nama].total += 1;
-      
+
       // Menambah jumlah berdasarkan status
       if (item.status) {
         inventoryGroups[item.nama][item.status] = (inventoryGroups[item.nama][item.status] || 0) + 1;
       }
     });
-    
+
     // Mengubah objek menjadi array untuk template
     const inventorySummary = Object.values(inventoryGroups);
 
     const borrowingStatsQuery = `
       SELECT 
-        DATE_FORMAT(b.borrow_date, '%Y-%m') AS month,
+        DATE_FORMAT(b.take_date, '%Y-%m') AS month,
         COUNT(*) AS total_borrowed
       FROM 
-        borrowings b
+        borrowing_logs b
       WHERE 
-        b.borrow_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
+        b.take_date IS NOT NULL
+        AND b.take_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
+
       GROUP BY 
-        DATE_FORMAT(b.borrow_date, '%Y-%m')
+        DATE_FORMAT(b.take_date, '%Y-%m')
       ORDER BY 
         month ASC
     `;
 
-    const returnStatsQuery = `
-      SELECT 
-        DATE_FORMAT(b.return_date, '%Y-%m') AS month,
-        COUNT(*) AS total_returned
-      FROM 
-        borrowings b
-      WHERE 
-        b.return_date IS NOT NULL
-        AND b.status = 'Dikembalikan'
-        AND b.return_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
-      GROUP BY 
-        DATE_FORMAT(b.return_date, '%Y-%m')
-      ORDER BY 
-        month ASC
-    `;
+    const perfectReturnStatsQuery =`
+    SELECT
+      DATE_FORMAT(return_date, '%Y-%m') AS month,
+      COUNT(*) AS total_perfect_condition
+    FROM
+      borrowing_logs
+    WHERE
+      return_date IS NOT NULL
+      AND item_condition = 'Sempurna'
+      AND return_date >= DATE_SUB(CURRENT_DATE(), INTERVAL 12 MONTH)
+    GROUP BY
+      DATE_FORMAT(return_date, '%Y-%m')
+    ORDER BY
+      month ASC
+`;
 
     const [borrowingStats] = await db.query(borrowingStatsQuery);
-    const [returnStats] = await db.query(returnStatsQuery);
+    const [perfectReturnStats] = await db.query(perfectReturnStatsQuery);
 
     const months = [];
     const borrowingData = [];
-    const returnData = [];
-    
+    const perfectReturnData = [];
+
     for (let i = 11; i >= 0; i--) {
       const date = new Date();
       date.setMonth(date.getMonth() - i);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       months.push(monthKey);
     }
-    
+
     months.forEach(month => {
       const found = borrowingStats.find(stat => stat.month === month);
       borrowingData.push(found ? found.total_borrowed : 0);
     });
-    
+
     months.forEach(month => {
-      const found = returnStats.find(stat => stat.month === month);
-      returnData.push(found ? found.total_returned : 0);
+      const found = perfectReturnStats.find(stat => stat.month === month);
+      perfectReturnData.push(found ? found.total_perfect_condition : 0);
     });
 
     const formattedMonths = months.map(month => {
@@ -130,22 +132,22 @@ const getAdminPage = async (req, res) => {
     `;
 
     const [statusDistribution] = await db.query(statusDistributionQuery);
-    
+
     const statusLabels = [];
     const statusData = [];
     const statusColors = [];
 
     const colorMap = {
-      'Tersedia': 'rgba(40, 167, 69, 0.8)', 
-      'Dipinjam': 'rgba(255, 193, 7, 0.8)', 
-      'Maintenance': 'rgba(23, 162, 184, 0.8)', 
-      'Lost': 'rgba(220, 53, 69, 0.8)'  
+      'Tersedia': 'rgba(40, 167, 69, 0.8)',
+      'Dipinjam': 'rgba(255, 193, 7, 0.8)',
+      'Maintenance': 'rgba(23, 162, 184, 0.8)',
+      'Lost': 'rgba(220, 53, 69, 0.8)'
     };
 
     statusDistribution.forEach(item => {
       statusLabels.push(item.status);
       statusData.push(item.count);
-      statusColors.push(colorMap[item.status] || 'rgba(108, 117, 125, 0.8)'); 
+      statusColors.push(colorMap[item.status] || 'rgba(108, 117, 125, 0.8)');
     });
 
     const frequentBorrowersQuery = `
@@ -153,13 +155,13 @@ const getAdminPage = async (req, res) => {
         u.username,
         COUNT(b.id) as borrow_count
       FROM 
-        borrowings b
+        borrowing_logs b
         JOIN users u ON b.user_id = u.id
       GROUP BY 
         u.id, u.username
       ORDER BY 
         borrow_count DESC
-      LIMIT 10
+      LIMIT 5
     `;
 
     const frequentItemsQuery = `
@@ -167,13 +169,13 @@ const getAdminPage = async (req, res) => {
         i.nama,
         COUNT(b.id) as borrow_count
       FROM 
-        borrowings b
+        borrowing_logs b
         JOIN inventories i ON b.inventory_id = i.id
       GROUP BY 
         i.id, i.nama
       ORDER BY 
         borrow_count DESC
-      LIMIT 10
+      LIMIT 5
     `;
 
     const [frequentBorrowers] = await db.query(frequentBorrowersQuery);
@@ -181,7 +183,7 @@ const getAdminPage = async (req, res) => {
 
     const borrowerNames = frequentBorrowers.map(borrower => borrower.username);
     const borrowerCounts = frequentBorrowers.map(borrower => borrower.borrow_count);
-    
+
     const itemNames = frequentItems.map(item => item.nama);
     const itemBorrowCounts = frequentItems.map(item => item.borrow_count);
 
@@ -192,7 +194,7 @@ const getAdminPage = async (req, res) => {
       inventorySummary,
       chartMonths: JSON.stringify(formattedMonths),
       chartBorrowingData: JSON.stringify(borrowingData),
-      chartReturnData: JSON.stringify(returnData),
+      chartPerfectReturnData: JSON.stringify(perfectReturnData),
       statusLabels: JSON.stringify(statusLabels),
       statusData: JSON.stringify(statusData),
       statusColors: JSON.stringify(statusColors),
@@ -203,8 +205,8 @@ const getAdminPage = async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
-    res.status(500).render('error', { 
-      message: 'Terjadi kesalahan saat mengambil data dashboard' 
+    res.status(500).render('error', {
+      message: 'Terjadi kesalahan saat mengambil data dashboard'
     });
   }
 };

@@ -28,7 +28,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <table id="datatablesSimple" class="table table-striped" style="width: 100%">
+                        <table id="tablebarang" class="table table-striped" style="width: 100%">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -201,6 +201,8 @@
             const removeBtn = document.getElementById('removeFile');
             const chooseBtn = document.getElementById('choose-btn');
             const textDropzone = document.getElementById('text-dropzone');
+
+            new DataTable('#tablebarang', {responsive: true});
 
             // Handle file selection
             const handleFileSelect = (files) => {

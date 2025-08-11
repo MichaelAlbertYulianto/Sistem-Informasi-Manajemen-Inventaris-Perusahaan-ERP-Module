@@ -115,10 +115,10 @@ const LoadEditInventory = async (req, res) => {
             return res.redirect("/inventory/overview");
         }
         const inventory = inventoryRows[0];
-        
+
         inventory.tanggal_pembelian = new Date(inventory.tanggal_pembelian).toISOString().split('T')[0];
         inventory.harga_pembelian = inventory.harga_pembelian !== null ? Number(inventory.harga_pembelian).toLocaleString('id-ID', { minimumFractionDigits: 0 }) : '';
-        
+
         // console.log("Inventory data:", inventory);
         res.render("pages/inventory/editForm", { inventory, status: statusRows[0].status });
     } catch (error) {
@@ -387,10 +387,10 @@ const bulkInsertInventory = async (req, res) => {
             }
 
             if (typeof tanggal_pembelian === "number") {
-                const excelDateBase = new Date(1899, 11, 30); 
+                const excelDateBase = new Date(1899, 11, 30);
                 tanggal_pembelian = new Date(excelDateBase.getTime() + (tanggal_pembelian * 86400000))
                     .toISOString()
-                    .split("T")[0]; 
+                    .split("T")[0];
             } else if (typeof tanggal_pembelian === "string") {
                 tanggal_pembelian = new Date(tanggal_pembelian).toISOString().split("T")[0];
             }
@@ -427,18 +427,38 @@ const bulkInsertInventory = async (req, res) => {
 };
 
 
+const getAvailableInventories = async (req, res) => {
+    try {
+        const [inventories] = await db.query(
+            `SELECT i.id, i.nama, i.deskripsi
+                 FROM inventories i
+                 JOIN inventory_statuses ist ON i.id = ist.inventory_id
+                 WHERE ist.status = 'Tersedia'`
+        );
+        // Format data untuk Select2
+        const formattedInventories = inventories.map(item => ({
+            id: item.id,
+            text: `${item.nama} (${item.deskripsi})`
+        }));
+        res.json({ results: formattedInventories });
+    } catch (error) {
+        console.error("Error fetching available inventories:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
 module.exports = {
     getOverviewInventory,
     downloadInvData,
     LoadaddInventory,
     addInventoryPost,
-    deleteInventory,
     LoadEditInventory,
+    deleteInventory,
     LoadInventoryStatus,
     downloadInventoryStatus,
+    bulkInsertInventory,
     LoadInventoryDetail,
     generateQrCode,
     updateInventory,
     downloadTemplate,
-    bulkInsertInventory,
+    getAvailableInventories, // Tambahkan ini
 };

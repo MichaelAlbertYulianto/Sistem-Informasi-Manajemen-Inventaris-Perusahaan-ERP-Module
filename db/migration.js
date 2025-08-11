@@ -36,13 +36,15 @@ const createInventoriesTableQuery = `
     );
 `;
 
-const createInventoryLogsTableQuery = `
-    CREATE TABLE IF NOT EXISTS inventory_logs (
+const createBorrowingLogs = `
+    CREATE TABLE IF NOT EXISTS borrowing_logs (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        inventory_id INT,
-        user_id INT,
-        activity VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        inventory_id INT NOT NULL,
+        user_id INT NOT NULL,
+        request_date TIMESTAMP NULL,
+        take_date TIMESTAMP NULL,
+        return_date TIMESTAMP NULL,
+        item_condition VARCHAR(255) NULL,
         FOREIGN KEY (inventory_id) REFERENCES inventories(id) ON DELETE CASCADE,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
@@ -63,9 +65,10 @@ const createBorrowingsTableQuery = `
         id INT AUTO_INCREMENT PRIMARY KEY,
         inventory_id INT NOT NULL,
         user_id INT NOT NULL,
-        borrow_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        request_date TIMESTAMP NULL,
+        take_date TIMESTAMP NULL,
         return_date TIMESTAMP NULL,
-        status ENUM('Dipinjam', 'Dikembalikan') DEFAULT 'Dipinjam',
+        status ENUM('Dipinjam', 'Dikembalikan', 'Diajukan') DEFAULT 'Dipinjam',
         FOREIGN KEY (inventory_id) REFERENCES inventories(id) ON DELETE CASCADE,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
@@ -74,7 +77,7 @@ const createBorrowingsTableQuery = `
 async function runMigration() {
     try {
         console.log("Dropping existing tables...");
-        await db.query("DROP TABLE IF EXISTS borrowings, inventory_logs, inventory_statuses, inventories, activity_logs, users");
+        await db.query("DROP TABLE IF EXISTS borrowings, borrowing_logs, inventory_statuses, inventories, activity_logs, users");
 
         console.log("Creating users table...");
         await db.query(createUsersTableQuery);
@@ -89,7 +92,7 @@ async function runMigration() {
         console.log("Inventories table created");
 
         console.log("Creating inventory logs table...");
-        await db.query(createInventoryLogsTableQuery);
+        await db.query(createBorrowingLogs);
         console.log("Inventory logs table created");
 
         console.log("Creating inventory statuses table...");

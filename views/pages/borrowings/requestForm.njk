@@ -1,0 +1,60 @@
+{% extends "layout/masterLayout.njk" %}
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Pengajuan Pinjaman Barang</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+        <li class="breadcrumb-item active">Pengajuan Pinjaman</li>
+    </ol>
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            Formulir Pengajuan
+        </div>
+        <div class="card-body">
+            <form action="/requestborrow" method="POST">
+                <div class="mb-3">
+                    <label for="inventory_id" class="form-label">Pilih Barang</label>
+                    <select class="form-select" id="inventory_id" name="inventory_id" required>
+                        <option value="">-- Pilih Barang --</option>
+                        <!-- Opsi barang akan dimuat di sini, bisa dari backend atau HTMX -->
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Ajukan Pinjaman</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        $('#inventory_id').select2({
+            placeholder: 'Cari barang...', // Placeholder text
+            allowClear: true, // Option to clear selected value
+            ajax: {
+                url: '/inventory/available', // Ganti dengan endpoint API yang baru
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // search term
+                        page: params.page
+                    };
+                },
+                processResults: function (data, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: data.results,
+                        pagination: {
+                            more: (params.page * 30) < data.total_count // Sesuaikan jika pagination diperlukan
+                        }
+                    };
+                },
+                cache: true
+            }
+        });
+    });
+</script>
+{% endblock %}

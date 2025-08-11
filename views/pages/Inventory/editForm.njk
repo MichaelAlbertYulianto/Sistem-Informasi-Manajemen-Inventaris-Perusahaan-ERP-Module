@@ -20,8 +20,8 @@
             <input type="text" class="form-control" id="harga_pembelian" name="harga_pembelian" required value="{{ inventory.harga_pembelian }}" placeholder="Masukkan harga beli">
         </div>
         <div class="mb-2">
-            <label for="status" class="form-label">Status:</label>
-            <select class="form-select" id="status" name="status" required>
+            {# <label for="status" class="form-label">Status:</label> #}
+            <select class="form-select" id="status" name="status" hidden required>
                 <option value="Tersedia" {% if status == "Tersedia" %}selected{% endif %}>Tersedia</option>
                 <option value="Maintenance" {% if status == "Maintenance" %}selected{% endif %}>Maintenance</option>
                 <option value="Lost" {% if status == "Lost" %}selected{% endif %}>Lost</option>

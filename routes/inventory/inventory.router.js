@@ -19,5 +19,6 @@ router.post('/inventory/edit/:id', inventory.LoadEditInventory);
 router.post('/inventory/update/:id', inventory.updateInventory);
 router.get('/inventory/download-template', inventory.downloadTemplate);
 router.post("/inventory/bulk-insert", upload.single("file"), inventory.bulkInsertInventory);
+router.get("/inventory/available", inventory.getAvailableInventories);
 
 module.exports = router;

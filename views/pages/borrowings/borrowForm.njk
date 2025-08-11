@@ -28,11 +28,11 @@
                         {% endfor %}
                     </select>
                 </div>
-
                 <div class="mb-3">
-                    <label for="borrow_date" class="form-label">Tanggal Peminjaman</label>
-                    <input type="date" class="form-control" id="borrow_date" name="borrow_date" required>
+                    {# <label for="request_date" class="form-label">Tanggal Pengajuan</label> #}
+                    <input type="date" class="form-control" id="request_date" name="request_date" hidden required>
                 </div>
+                <input type="hidden" name="status" value="Dipinjam">
 
                 <button type="submit" class="btn btn-primary">Simpan</button>
             </form>
@@ -43,7 +43,11 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         let today = new Date().toISOString().split("T")[0];
-        document.getElementById("borrow_date").value = today;
+        document.getElementById("take_date").value = today;
+    });
+        document.addEventListener("DOMContentLoaded", function () {
+        let today = new Date().toISOString().split("T")[0];
+        document.getElementById("request_date").value = today;
     });
 </script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -56,7 +60,7 @@
         });
         
         let today = new Date().toISOString().split("T")[0];
-        document.getElementById("borrow_date").value = today;
+        document.getElementById("take_date").value = today;
     });
 </script>
 

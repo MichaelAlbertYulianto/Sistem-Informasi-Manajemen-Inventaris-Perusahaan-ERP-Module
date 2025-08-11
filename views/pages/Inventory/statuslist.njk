@@ -10,12 +10,8 @@
                     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
                         <span class="mb-2 mb-sm-0">Daftar Status</span>
                         <div class="d-flex flex-wrap gap-2">
-                            {# <button class="btn btn-primary btn-sm" id="btnTambah" data-bs-toggle="modal" data-bs-target="#tambahModal" href="/status/add" >
-                                <i class="fas fa-plus me-1"></i>
-                                <span class="d-none d-sm-inline">Tambah Status</span>
-                                <span class="d-inline d-sm-none">Tambah</span>
-                            </button> #}
-                            <button class="btn btn-info btn-sm text-white" id="btnDownloadData" >
+                            {# ... button tambah (dihapus) #}
+                            <button class="btn btn-info btn-sm text-white" id="btnDownloadData">
                                 <i class="fas fa-file-excel me-1"></i>
                                 <span class="d-none d-sm-inline">Download Data</span>
                                 <span class="d-inline d-sm-none">Data</span>
@@ -24,7 +20,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <table id="datatablesSimple" class="table table-striped" style="width: 100%" >
+                    <table id="statustable" class="table table-striped" style="width: 100%">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -32,7 +28,6 @@
                                 <th>Nama</th>
                                 <th>Deskripsi</th>
                                 <th>status</th>
-                                {# <th>Action</th> #}
                             </tr>
                         </thead>
                         <tbody>
@@ -53,13 +48,6 @@
                                             <span class="badge bg-info text-dark" style="width: 100px;">{{ status.statusBrg }}</span>
                                         {% endif %}
                                     </td>
-                                    {# <td>
-                                        <a href="/status/edit/{{ status.id }}" class="btn btn-sm btn-warning" >Edit</a >
-                                        <form action="/status/delete/{{ status.id }}" method="post" style="display: inline" >
-                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus {{
-                                                status.nama }}?')" > Delete</button>
-                                        </form>
-                                    </td> #}
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -71,21 +59,30 @@
 </div>
 
 <script>
-        document
-            .getElementById("btnDownloadData")
-            .addEventListener("click", () => {
-                window.location.href = "/inventory/status/download"
-                Toastify({
-                    text: "Download berhasil! Silakan cek folder download Anda.", duration: 5000, close: true, gravity: "top", // `top` or `bottom`
-                    position: "right", // `left`, `center` or `right`
-                    stopOnFocus: true, // Prevents dismissing of toast on hover
-                    style: {
-                        background: "linear-gradient(to right, #00b09b, #96c93d)",
-                        marginTop: "50px"
-                    },
-                    onClick: function () {}, // Callback after click
-                }).showToast()
-            })
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inisialisasi DataTables
+        new DataTable('#statustable', {
+            responsive: true
+        });
+
+        // Event listener untuk tombol download
+        document.getElementById("btnDownloadData").addEventListener("click", () => {
+            window.location.href = "/inventory/status/download";
+            Toastify({
+                text: "Download berhasil! Silakan cek folder download Anda.",
+                duration: 5000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
+                style: {
+                    background: "linear-gradient(to right, #00b09b, #96c93d)",
+                    marginTop: "50px"
+                },
+                onClick: function () {},
+            }).showToast();
+        });
+    });
 </script>
 
 {% endblock %}

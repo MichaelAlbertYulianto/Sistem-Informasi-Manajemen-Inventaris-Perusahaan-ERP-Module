@@ -1,126 +1,253 @@
 {% extends "layout/masterLayout.njk" %}
 {% block content %}
 
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Pengembalian Pinjaman</h1>
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">Pengembalian Pinjaman</h1>
 
-    <!-- Flash Messages -->
-    {% if success %}
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ success }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    {% endif %}
-    {% if error %}
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ error }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    {% endif %}
+        <!-- Flash Messages -->
+        {% if success %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ success }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+        {% if error %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ error }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
 
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-table me-1"></i>
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
             Daftar Peminjaman
         </div>
-        <div class="card-body">
-            <table id="borrowingsTable" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>ID Peminjaman</th>
-                        <th>Barang</th>
-                        <th>Peminjam</th>
-                        <th>Tanggal Pinjam</th>
-                        <th>Tanggal Kembali</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for borrow in borrowings %}
-                    <tr>
-                        <td>{{ loop.index }}</td>
-                        <td><strong>#{{ borrow.id }}</strong></td>
-                        <td>{{ borrow.inventory_name }}</td>
-                        <td>{{ borrow.username }}</td>
-                        <td>{{ borrow.borrow_date }}</td>
-                        <td>{{ borrow.return_date }}</td>
-                        <td>
-                            {% if borrow.status == 'Dipinjam' %}
-                                <span class="badge bg-warning text-dark">Dipinjam</span>
-                            {% else %}
-                                <span class="badge bg-success">Dikembalikan</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if borrow.status == 'Dipinjam' %}
-                                <button class="btn btn-success btn-sm return-btn" 
-                                        data-borrow-id="{{ borrow.id }}" 
-                                        data-borrow-name="{{ borrow.inventory_name }}">
-                                    Kembalikan
-                                </button>
-                            {% else %}
-                                <button class="btn btn-secondary btn-sm" disabled>Sudah Dikembalikan</button>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="card-body">
+                <table id="borrowingsTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>ID Peminjaman</th>
+                            <th>ID Barang</th>
+                            <th>Barang</th>
+                            <th>Peminjam</th>
+                            <th>Tanggal Pengajuan</th>
+                            <th>Tanggal Ambil</th>
+                            <th>Tanggal Kembali</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for borrow in borrowings %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>
+                                    <strong>#{{ borrow.id }}</strong>
+                                </td>
+                                <td>{{ borrow.inventory_id }}
+                                </td>
+                                <td>{{ borrow.inventory_name }}</td>
+                                <td>{{ borrow.username }}</td>
+                                <td>{{ borrow.request_date }}
+                                </td>
+                                <td>{{ borrow.take_date }}</td>
+                                <td>{{ borrow.return_date }}</td>
+                                <td>
+                                    {% if borrow.status == 'Dipinjam' %}
+                                        <span class="badge bg-warning text-dark">Dipinjam</span>
+                                    {% elif borrow.status == 'Dikembalikan' %}
+                                        <span class="badge bg-success">Dikembalikan</span>
+                                    {% elif borrow.status == 'Diajukan' %}
+                                        <span class="badge bg-primary">Diajukan</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if borrow.status == 'Diajukan' %}
+                                        <button class="btn btn-primary btn-sm take-btn" data-borrow-id="{{ borrow.id }}" data-borrow-name="{{ borrow.inventory_name }}" data-request-date="{{ borrow.request_date }}"> Ambil </button>
+                                    {% elif borrow.status == 'Dipinjam' %}
+                                        <button class="btn btn-success btn-sm return-btn" data-borrow-id="{{ borrow.id }}" data-borrow-name="{{ borrow.inventory_name }}" data-take-date="{{ borrow.take_date }}"> Kembalikan </button>
+                                    {% else %}
+                                        <button class="btn btn-secondary btn-sm" disabled>Sudah Dikembalikan</button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Modal Konfirmasi Pengembalian -->
-<div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="returnModalLabel">Konfirmasi Pengembalian</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="returnForm" method="POST">
-                    <input type="hidden" id="borrow_id" name="borrow_id">
-                    <div class="mb-3">
-                        <label for="return_date" class="form-label">Tanggal Kembali</label>
-                        <input type="date" class="form-control" id="return_date" name="return_date" required>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Konfirmasi</button>
-                    </div>
-                </form>
+    <!-- Modal Konfirmasi Pengambilan -->
+    <div class="modal fade" id="takeModal" tabindex="-1" aria-labelledby="takeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="takeModalLabel">Konfirmasi Pengambilan Barang</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="takeForm" method="POST">
+                        <input type="hidden" id="take_borrow_id" name="borrow_id">
+                        <div class="mb-3">
+                            <label for="take_date_input" class="form-label">Tanggal Ambil</label>
+                            <input type="date" class="form-control" id="take_date_input" name="take_date" required max="">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Konfirmasi Ambil</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Modal Konfirmasi Pengembalian -->
+    <div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="returnModalLabel">Konfirmasi Pengembalian Barang</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="returnForm" method="POST">
+                        <input type="hidden" id="return_borrow_id" name="borrow_id">
+                        <div class="mb-3">
+                            <label for="return_date_input" class="form-label">Tanggal Kembali</label>
+                            <input type="date" class="form-control" id="return_date_input" name="return_date" required max="">
+                        </div>
+                        <div class="mb-3">
+                            <label for="item_condition" class="form-label">Kondisi Barang</label>
+                            <select class="form-select" id="item_condition" name="item_condition" required>
+                                <option value="">Pilih Kondisi</option>
+                                <option value="Sempurna">Sempurna</option>
+                                <option value="Rusak">Rusak</option>
+                                <option value="Hilang">Hilang</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success">Konfirmasi Pengembalian</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 
 {% block scripts %}
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let returnForm = document.getElementById("returnForm");
-        let returnModal = new bootstrap.Modal(document.getElementById("returnModal"));
-        let returnDateInput = document.getElementById("return_date");
-        let borrowIdInput = document.getElementById("borrow_id");
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            new DataTable('#borrowingsTable', {responsive: true});
+            // Fungsi helper untuk mengkonversi tanggal dari 'DD Mon YYYY' ke 'YYYY-MM-DD'
+            function convertDateToISO(dateString) {
+                if (!dateString) 
+                    return null;
+                const parts = dateString.split(' ');
+                const day = parts[0];
+                const monthNames = {
+                    'Jan': '01',
+                    'Feb': '02',
+                    'Mar': '03',
+                    'Apr': '04',
+                    'Mei': '05',
+                    'Jun': '06',
+                    'Jul': '07',
+                    'Agu': '08',
+                    'Sep': '09',
+                    'Okt': '10',
+                    'Nov': '11',
+                    'Des': '12'
+                };
+                const month = monthNames[parts[1]];
+                const year = parts[2];
+                return `${year}-${month}-${day}`;
+            }
 
-        let today = new Date().toISOString().split("T")[0];
-        returnDateInput.value = today;
+            // Inisialisasi elemen dan modal
+            let returnModal = new bootstrap.Modal(document.getElementById("returnModal"));
+            let takeModal = new bootstrap.Modal(document.getElementById("takeModal"));
+            let returnForm = document.getElementById("returnForm");
+            let returnDateInput = document.getElementById("return_date_input");
+            let returnBorrowIdInput = document.getElementById("return_borrow_id");
+            let takeForm = document.getElementById("takeForm");
+            let takeDateInput = document.getElementById("take_date_input");
+            let takeBorrowIdInput = document.getElementById("take_borrow_id");
 
-        document.querySelectorAll(".return-btn").forEach(button => {
-            button.addEventListener("click", function () {
-                let borrowId = this.getAttribute("data-borrow-id");
-                let itemName = this.getAttribute("data-borrow-name");
+            let today = new Date()
+                .toISOString()
+                .split("T")[0];
 
-                borrowIdInput.value = borrowId;
-                returnForm.action = `/borrowings/return/${borrowId}`;
+            // Event listener untuk tombol "Kembalikan"
+            document
+                .querySelectorAll(".return-btn")
+                .forEach(button => {
+                    button.addEventListener("click", function () {
+                        let borrowId = this.getAttribute("data-borrow-id");
+                        let takeDateString = this.getAttribute("data-take-date");
+                        let takeDateISO = convertDateToISO(takeDateString); // Konversi tanggal
 
-                returnModal.show();
-            });
+                        returnBorrowIdInput.value = borrowId;
+                        returnForm.action = `/borrowings/return/${borrowId}`;
+
+                        returnDateInput.value = today;
+                        if (takeDateISO) {
+                            returnDateInput.setAttribute('min', takeDateISO);
+                        }
+                        returnDateInput.setAttribute('max', today);
+
+                        // Tambahkan event listener untuk validasi tambahan
+                        returnDateInput.addEventListener('change', function () {
+                            const selectedDate = this.value;
+                            const minDate = this.getAttribute('min');
+                            const maxDate = this.getAttribute('max');
+                            if (selectedDate < minDate) {
+                                this.value = minDate;
+                            } else if (selectedDate > maxDate) {
+                                this.value = maxDate;
+                            }
+                        });
+
+                        returnModal.show();
+                    });
+                });
+
+            // Event listener untuk tombol "Ambil"
+            document
+                .querySelectorAll(".take-btn")
+                .forEach(button => {
+                    button.addEventListener("click", function () {
+                        let borrowId = this.getAttribute("data-borrow-id");
+                        let requestDateString = this.getAttribute("data-request-date");
+                        let requestDateISO = convertDateToISO(requestDateString); // Konversi tanggal
+
+                        takeBorrowIdInput.value = borrowId;
+                        takeForm.action = `/borrowings/take/${borrowId}`;
+
+                        takeDateInput.value = today;
+                        if (requestDateISO) {
+                            takeDateInput.setAttribute('min', requestDateISO);
+                        }
+                        takeDateInput.setAttribute('max', today);
+
+                        // Tambahkan event listener untuk validasi tambahan
+                        takeDateInput.addEventListener('change', function () {
+                            const selectedDate = this.value;
+                            const minDate = this.getAttribute('min');
+                            const maxDate = this.getAttribute('max');
+                            if (selectedDate < minDate) {
+                                this.value = minDate;
+                            } else if (selectedDate > maxDate) {
+                                this.value = maxDate;
+                            }
+                        });
+
+                        takeModal.show();
+                    });
+                });
         });
-    });
-</script>
+    </script>
 {% endblock %}
