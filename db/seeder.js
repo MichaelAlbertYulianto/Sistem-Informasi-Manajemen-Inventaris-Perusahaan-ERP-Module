@@ -17,7 +17,7 @@ const usersData = [
     username: "manager",
     email: "manager@omniflow.id",
     password: "Manager12345.",
-    role: "Manager",
+    role: "Admin",
   },
   {
     username: "admin inventaris",
@@ -41,7 +41,7 @@ const usersData = [
     username: "logistik",
     email: "logistik@omniflow.id",
     password: "Logistik12345.",
-    role: "Manager",
+    role: "Admin",
   },
   {
     username: "supervisor",
@@ -59,7 +59,7 @@ const usersData = [
     username: "audit",
     email: "audit@omniflow.id",
     password: "Audit12345.",
-    role: "Manager",
+    role: "Admin",
   },
 ];
 

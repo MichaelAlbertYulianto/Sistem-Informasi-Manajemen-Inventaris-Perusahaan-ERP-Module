@@ -2,7 +2,38 @@ const { db } = require("../../db/db");
 
 const getRequestPage = async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
-    res.render("pages/borrowings/requestForm", { today } );
+    const user_id = req.session.user.id;
+
+    let connection;
+    try {
+        connection = await db.getConnection();
+        const [borrowings] = await connection.execute(
+            `SELECT
+                b.id,
+                b.inventory_id,
+                i.nama AS inventory_name,
+                DATE_FORMAT(b.request_date, '%d %M %Y') AS formatted_date,
+                b.status
+            FROM
+                borrowings b
+            JOIN
+                inventories i ON b.inventory_id = i.id
+            WHERE
+                b.user_id = ?
+            ORDER BY
+                b.request_date DESC`,
+            [user_id]
+        );
+        res.render("pages/borrowings/requestForm", { today, borrowings });
+    } catch (error) {
+        console.error('Error fetching borrowing data:', error);
+        req.flash('error', 'Gagal mengambil data peminjaman: ' + error.message);
+        res.render("pages/borrowings/requestForm", { today, borrowings: [] });
+    } finally {
+        if (connection) {
+            connection.release();
+        }
+    }
 };
 
 const postRequestBorrow = async (req, res) => {

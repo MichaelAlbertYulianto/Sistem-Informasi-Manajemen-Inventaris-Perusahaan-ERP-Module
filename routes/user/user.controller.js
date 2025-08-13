@@ -365,7 +365,7 @@ const getUserEditPage = async (req, res) => {
     
     const user = users[0];
     
-    if (req.session.user.role !== 'Admin' && req.session.user.id != userId) {
+    if (req.session.user.role !== 'SuperAdmin' && req.session.user.id != userId) {
       req.flash("error", "Anda tidak memiliki akses untuk mengedit user ini!");
       return res.redirect("/user/index");
     }
@@ -402,7 +402,7 @@ const updateUser = async (req, res) => {
       return res.redirect("/user/index");
     }
     
-    if (req.session.user.role !== 'Admin' && req.session.user.id != userId) {
+    if (req.session.user.role !== 'SuperAdmin' && req.session.user.id != userId) {
       await log(
         `User ${req.session.user.username} mencoba mengedit user ${userId} tanpa izin`,
         LOG_LEVELS.WARN,
@@ -434,7 +434,7 @@ const updateUser = async (req, res) => {
     let updateQuery = "UPDATE users SET username = ?, email = ?, updated_at = ?";
     let updateParams = [username, email, new Date().toISOString().slice(0, 19).replace("T", " ")];
 
-    if (req.session.user.role === 'Admin') {
+    if (req.session.user.role === 'SuperAdmin') {
       updateQuery += ", role = ?";
       updateParams.push(role);
     }
@@ -489,7 +489,7 @@ const deleteUser = async (req, res) => {
   })();
 
   try {
-    if (req.session.user.role !== 'Admin') {
+    if (req.session.user.role !== 'SuperAdmin') {
       await log(
         `User ${req.session.user.username} mencoba menghapus user ${userId} tanpa izin`,
         LOG_LEVELS.WARN,

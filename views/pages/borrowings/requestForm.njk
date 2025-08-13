@@ -1,60 +1,118 @@
 {% extends "layout/masterLayout.njk" %}
 {% block content %}
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Pengajuan Pinjaman Barang</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-        <li class="breadcrumb-item active">Pengajuan Pinjaman</li>
-    </ol>
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-table me-1"></i>
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">Pengajuan Pinjaman Barang</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item">
+                <a href="/">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active">Pengajuan Pinjaman</li>
+        </ol>
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-table me-1"></i>
             Formulir Pengajuan
         </div>
-        <div class="card-body">
-            <form action="/requestborrow" method="POST">
-                <div class="mb-3">
-                    <label for="inventory_id" class="form-label">Pilih Barang</label>
-                    <select class="form-select" id="inventory_id" name="inventory_id" required>
-                        <option value="">-- Pilih Barang --</option>
-                        <!-- Opsi barang akan dimuat di sini, bisa dari backend atau HTMX -->
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Ajukan Pinjaman</button>
-            </form>
+            <div class="card-body">
+                <form action="/requestborrow" method="POST">
+                    <div class="mb-3">
+                        <label for="inventory_id" class="form-label">Pilih Barang</label>
+                        <select class="form-select" id="inventory_id" name="inventory_id" required>
+                            <option value="">-- Pilih Barang --</option>
+                            <!-- Opsi barang akan dimuat di sini, bisa dari backend atau HTMX -->
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Ajukan Pinjaman</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title">Daftar Pengajuan/Peminjaman Anda</h5>
+            </div>
+            <div class="card-body">
+                {% if borrowings.length > 0 %}
+                    <div class="table-responsive">
+                        <table id="borrowingsTable" class="table table-bordered table-striped display nowrap" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>ID Barang</th> <!-- Menambahkan kolom ID Barang -->
+                                    <th>Nama Barang</th>
+                                    <th>Tanggal Pengajuan</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    {% for borrowing in borrowings %}
+                                        <tr>
+                                            <td>{{ borrowing.inventory_id }}</td> 
+                                            <td>{{ borrowing.inventory_name }}</td>
+                                            <td>{{ borrowing.formatted_date }}</td>
+                                            <td>{{ borrowing.status }}</td>
+                                        </tr>
+                                    {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p>Anda belum memiliki pengajuan atau peminjaman.</p>
+                {% endif %}
+            </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
-<script>
-    $(document).ready(function() {
-        $('#inventory_id').select2({
-            placeholder: 'Cari barang...', // Placeholder text
-            allowClear: true, // Option to clear selected value
-            ajax: {
-                url: '/inventory/available', // Ganti dengan endpoint API yang baru
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return {
-                        q: params.term, // search term
-                        page: params.page
-                    };
-                },
-                processResults: function (data, params) {
-                    params.page = params.page || 1;
-                    return {
-                        results: data.results,
-                        pagination: {
-                            more: (params.page * 30) < data.total_count // Sesuaikan jika pagination diperlukan
-                        }
-                    };
-                },
-                cache: true
-            }
+    <script>
+        $(document).ready(function () {
+            $('#inventory_id').select2({
+                placeholder: 'Cari barang...', // Placeholder text
+                allowClear: true, // Option to clear selected value
+                ajax: {
+                    url: '/inventory/available', // Ganti dengan endpoint API yang baru
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            q: params.term, // search term
+                            page: params.page
+                        };
+                    },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        return {
+                            results: data.results,
+                            pagination: {
+                                more: (params.page * 30) < data.total_count // Sesuaikan jika pagination diperlukan
+                            }
+                        };
+                    },
+                    cache: true
+                }
+            });
         });
-    });
-</script>
+
+        $(document).ready(function () {
+            $("#borrowingsTable").DataTable({
+                responsive: true,
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    zeroRecords: "Tidak ada data yang ditemukan",
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    infoEmpty: "Tidak ada data yang tersedia",
+                    infoFiltered: "(disaring dari _MAX_ total data)",
+                    paginate: {
+                        first: "<i class='fas fa-angle-double-left'></i>",
+                        last: "<i class='fas fa-angle-double-right'></i>",
+                        next: "<i class='fas fa-chevron-right'></i>",
+                        previous: "<i class='fas fa-chevron-left'></i>"
+                    }
+                },
+                pageLength: 5,
+                lengthMenu: [5, 10, 25, 50, 100]
+            })
+        })
+    </script>
 {% endblock %}

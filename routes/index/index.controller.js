@@ -39,16 +39,15 @@ const getAdminPage = async (req, res) => {
         };
       }
 
-      // Menambah total
-      inventoryGroups[item.nama].total += 1;
+      if (item.status === 'Tersedia' || item.status === 'Dipinjam') {
+        inventoryGroups[item.nama].total += 1;
+      }
 
-      // Menambah jumlah berdasarkan status
       if (item.status) {
         inventoryGroups[item.nama][item.status] = (inventoryGroups[item.nama][item.status] || 0) + 1;
       }
     });
 
-    // Mengubah objek menjadi array untuk template
     const inventorySummary = Object.values(inventoryGroups);
 
     const borrowingStatsQuery = `
